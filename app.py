@@ -32,7 +32,9 @@ def create_app(config_file='app_config.py'):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(user_id)
+        requested_user = User.query.get(user_id)
+        if requested_user.confirmed_email:
+            return requested_user
 
     app.register_blueprint(home)
     app.register_blueprint(post)
