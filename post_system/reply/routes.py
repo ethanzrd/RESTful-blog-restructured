@@ -12,7 +12,7 @@ def delete_reply(reply_id):
     requested_reply = Reply.query.get(reply_id)
     current_c = request.args.get('c_page', 1)
     if requested_reply:
-        reply_deletion(requested_reply, current_c)
+        return reply_deletion(requested_reply, current_c)
     else:
         return abort(404)
 
