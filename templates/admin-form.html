@@ -1,0 +1,82 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "bootstrap/base.html" %}
+{% block content %}
+{% include "header.html" %}
+<!-- Page Header -->
+<header class="masthead" style="background-image: url({{ background_image }})">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                {% if category != 'author' %}
+                <div class="page-heading">
+                    <h1 style="color: {{navbar}}">{% if authorization != True %}{% if remove != 'True' %}New Administrator Report{% else %}Remove
+                        Administrator Report{% endif %}{% else %}{% if remove != 'True' %}Set User as Administrator{%
+                        else
+                        %}Remove User as an Administrator{% endif %}
+                        Attempt{% endif %}</h1>
+                    <span class="subheading" style="color: {{navbar}}">{% if authorization != True %}{% if remove != 'True' %}New Admin Report For:{% else %}Remove Admin Report For:{% endif %} {{ user_name }}{% else %}You are to {% if remove != 'True' %}set{% else %}remove{% endif %} a user as an administrator, in order to {% if remove != 'True' %}set{% else %}remove{% endif %} the user as an administrator, you must provide a valid authentication password.{% endif %}<br><br>Please note that you are required to present a reasonable explanation to your action, you may not {% if remove != 'True' %}set{% else %}remove{% endif %} users as administrators for personal and/or without a corresponding reason.</span>
+                </div>
+                {% else %}
+                <div class="page-heading" style="color: {{navbar}}">
+                    <h1>{% if remove != 'True' %}New{% else %}Remove{% endif %} Author Report</h1>
+                    <span class="subheading" style="color: {{navbar}}">{% if remove != 'True' %}New{% else %}Remove{% endif %} Author Report For: {{ user_name }}<br><br>Please note that you are required to present a reasonable explanation to your action, you may not {% if remove == True %}set{% else %}remove{% endif %} users as authors for personal and/or without a corresponding reason.</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container" style="margin-bottom: 20px;">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto" style="line-height: 2.5;">
+            {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+            <div class="alert alert-danger" role="alert" style="margin-bottom: 20px;">
+                <center>
+                    <strong>{{ message }}</strong>
+                </center>
+            </div>
+            {% endfor %}
+            {% endwith %}
+            {% if remove != 'True' %}
+            {% if category != 'author' %}
+            {% if authorization != True %}
+            <form action="{{ url_for('verification.handle_new_admin', token=token, user_id=user_id) }}" method="post" novalidate>
+                {% else %}
+                <form action="{{ url_for('verification.admin_auth', user_id=user_id) }}" method="post" novalidate>
+                    {% endif %}
+                    {{ ckeditor.load() }}
+                    {{ wtf.quick_form(form=form, button_map={"submit": "primary"}) }}
+                </form>
+                {% else %}
+                <form action="{{ url_for('user_operations.make_author', user_id=user_id) }}" method="post" novalidate>
+                    {{ ckeditor.load() }}
+                    {{ wtf.quick_form(form=form, button_map={"submit": "primary"}) }}
+                </form>
+                {% endif %}
+                {% else %}
+                {% if category != 'author' %}
+                {% if authorization != True %}
+                <form action="{{ url_for('verification.handle_admin_removal', token=token, user_id=user_id) }}" method="post" novalidate>
+                    {% else %}
+                    <form action="{{ url_for('verification.admin_auth', user_id=user_id, remove=True) }}" method="post" novalidate>
+                        {% endif %}
+                        {{ ckeditor.load() }}
+                        {{ wtf.quick_form(form=form, button_map={"submit": "primary"}) }}
+                    </form>
+                    {% else %}
+                    <form action="{{ url_for('user_operations.remove_author', user_id=user_id) }}" method="post" novalidate>
+                        {{ ckeditor.load() }}
+                        {{ wtf.quick_form(form=form, button_map={"submit": "primary"}) }}
+                    </form>
+                    {% endif %}
+                    {% endif %}
+        </div>
+    </div>
+</div>
+<hr>
+
+{% include "footer.html" %}
+{% endblock %}

@@ -1,0 +1,345 @@
+{% extends "bootstrap/base.html" %}
+{% block content %}
+{% include "header.html" %}
+<header class="masthead"
+        style="background-image: url({{ background_image }})">
+    <!--        style="background-image: url('https://images.unsplash.com/photo-1470092306007-055b6797ca72?ixlib=rb-1.2.1&auto=format&fit=crop&w=668&q=80')">-->
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="site-heading">
+                    <h1 style="color: {{navbar}}">{{ title }}</h1>
+                    <span class="subheading" style="color: {{navbar}}">{{ subtitle }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+            {% if message != 'The user has been set as an administrator, a notification has been sent to the user.'
+            and message != 'The user has been removed as an administrator, a notification has been sent to the user.'
+            and
+            message != 'This user has been set as an author, a notification has been sent to the user.' and
+            message != 'This user has been removed as an author, a notification has been sent to the user.' and
+            message != 'API Key copied to clipboard.' %}
+            <div class="alert alert-danger" role="alert" style="margin-bottom: 50px;">
+                <center>
+                    <strong>{{ message }}</strong>
+                </center>
+            </div>
+            {% else %}
+            <div class="alert alert-success" role="alert" style="margin-bottom: 50px;">
+                <center>
+                    <strong>{{ message }}</strong>
+                </center>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% endwith %}
+            {% set valid = True %}
+            {% if notification != True %}
+            {% if current_mode != 'api' and current_mode != 'delete-report' %}
+            {% if current_mode == 'posts' %}
+            {% if posts_count != 0 %}
+            {% for post in all_posts %}
+            <div class="post-preview">
+                <a href="{{ url_for('post.show_post', post_id=post.id) }}">
+                    <h2 class="post-title">
+                        {{post.title}}
+                    </h2>
+                    <h3 class="post-subtitle">
+                        {{post.subtitle}}
+                    </h3>
+                </a>
+                <p class="post-meta">Posted by
+                    <a href="#">{{post.author.name}}</a>
+                    on {{post.date}}
+            </div>
+            <hr>
+            {% endfor %}
+            {% else %}
+            {% set valid = False %}
+            {% for i in range(3): %}
+            <div class="post-preview">
+                <a href="#">
+                    <h2 class="post-title">
+                        Nothing to show here.
+                    </h2>
+                    <h3 class="post-subtitle">
+                        Looks like there's nothing here.
+                    </h3>
+                </a>
+                <p class="post-meta">
+                    <a href="#">You've reached a dead end, my friend.</a>
+                </p>
+            </div>
+            <hr>
+            {% endfor %}
+            {% endif %}
+            {% else %}
+            {% if posts_count != 0 %}
+            {% for comment in comments %}
+            <div class="post-preview">
+                <a href="{{ url_for('comment.show_comment', comment_id=comment.id) }}">
+                    <h2 class="post-title">
+                        Commented on "{{comment.parent_post.title}}"
+                    </h2>
+                    <h3 class="post-subtitle">
+                        {{ comment.comment|safe() }}
+                    </h3>
+                </a>
+                <p class="post-meta">By
+                    <a href="#">{{comment.author.name}}</a>
+                    on {{comment.date}}
+            </div>
+            <hr>
+            {% endfor %}
+            {% else %}
+            {% set valid = False %}
+            {% for i in range(3): %}
+            <div class="post-preview">
+                <a href="#">
+                    <h2 class="post-title">
+                        Nothing to show here.
+                    </h2>
+                    <h3 class="post-subtitle">
+                        Looks like there's nothing here.
+                    </h3>
+                </a>
+                <p class="post-meta">
+                    <a href="#">You've reached a dead end, my friend.</a>
+                </p>
+            </div>
+            <hr>
+            {% endfor %}
+            {% endif %}
+            {% endif %}
+            {% else %}
+            {% if posts_count != 0 %}
+            {% for post in all_posts %}
+            {% if post != 'approval' and post != 'rejection' %}
+            <div class="post-preview">
+                <a href="#">
+                    {% if post == "name" %}
+                    <h2 class="post-title">
+                        {{all_posts[post]}} - {{all_posts["description"]}}
+                    </h2>
+                    {% endif %}
+                    {% if post != 'name' and post != 'description' and post != 'key_id' %}
+                    <h2 class="post-title">
+                        {{post}}
+                    </h2>
+                    <h3 class="post-subtitle" style="margin-top: 20px;">
+                        {{all_posts[post]}}
+                    </h3>
+                    {% endif %}
+                </a>
+                <p class="post-meta">
+
+                </p>
+            </div>
+            {% if post != "name" and post != "key_id" %}
+            <hr>
+            {% endif %}
+            {% endif %}
+            {% endfor %}
+            {% if current_user.is_authenticated and current_user.admin == True and current_mode == 'delete-report' %}
+            <div class="post-preview">
+                <a href="#">
+                    <h2 class="post-title">
+
+                    </h2>
+
+                    <h3 class="post-subtitle" style="margin-top: 20px;">
+                        <a href="{{all_posts['approval']}}">Approve Request</a>
+                        <br>
+                        <br>
+                        <a href="{{all_posts['rejection']}}">Reject Request</a>
+                    </h3>
+
+                </a>
+                <p class="post-meta">
+
+                </p>
+            </div>
+            <hr>
+            {% endif %}
+            {% else %}
+            {% set valid = False %}
+            {% for i in range(3): %}
+            <div class="post-preview">
+                <a href="#">
+                    <h2 class="post-title">
+                        Nothing to show here.
+                    </h2>
+                    <h3 class="post-subtitle">
+                        Looks like there's nothing here.
+                    </h3>
+                </a>
+                <p class="post-meta">
+                    <a href="#">You've reached a dead end, my friend.</a>
+                </p>
+            </div>
+            <hr>
+            {% endfor %}
+            {% endif %}
+            {% endif %}
+            {% else %}
+            {% if posts_count != 0 %}
+            {% for notification in notification_items %}
+            <ul class="commentList" style="list-style-type: none;">
+                {% set category = notification['category'] %}
+                <li>
+                    <div class="commenterImage">
+                        <img src="{{ notification['by_user'].email | gravatar }}" style="border-radius: 100px;"/>
+                    </div>
+                    <div>
+
+                                <span class="date sub-text" style="margin-left: 10px; font-size: 15px; color: #025955;">{% if notification['by_user'] != None %}<a
+                                        href="{{ url_for('user_operations.user_page', user_id=notification['by_user'].id) }}"
+                                        style="text-decoration: none;">{{ notification['user_name'] }}</a>{% else %}{{ notification['user_name'] }} (Deleted User) {% endif %} | {{ notification["date"] }} {% if category != 'new' and category != 'removal' %}| <a style="text-decoration: none;" href="{% if category == 'comment' %}{{ url_for('comment.show_comment', comment_id=notification['parent_comment'].id) }}{% elif category == 'reply' %}{{ url_for('comment.show_comment', comment_id=notification['parent_reply'].parent_comment.id) }}{% elif category == 'block' or category == 'unblock' %}{{ url_for('user_operations.user_page', user_id=current_user.id, current_mode='api') }}{% endif %}">View {% if category == 'comment' %}Comment{% elif category == 'reply' %}Comment{% elif category == 'block' or category == 'unblock' %}API Key Information{% endif %}</a>{% endif %}</span>
+                        <span style="margin-left: 20px;"><br><br>{{ notification["body"] }}<br><br></span>
+                    </div>
+                    <hr style="margin: 5px 0 0 0;">
+                </li>
+            </ul>
+            {% endfor %}
+            {% else %}
+            {% set valid = False %}
+            {% for i in range(3): %}
+            <div class="post-preview">
+                <a href="#">
+                    <h2 class="post-title">
+                        Nothing to show here.
+                    </h2>
+                    <h3 class="post-subtitle">
+                        Looks like there's nothing here.
+                    </h3>
+                </a>
+                <p class="post-meta">
+                    <a href="#">You've reached a dead end, my friend.</a>
+                </p>
+            </div>
+            <hr>
+            {% endfor %}
+            {% endif %}
+            {% endif %}
+            <!-- Pager -->
+            <div class="clearfix">
+                {% if notification != True %}
+                {% if current_id == 1 %}
+                <div class="dropdown">
+                    <button class="btn btn-primary float-left" data-toggle="dropdown" type="button">
+                        USER PANEL
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        {% if current_mode != 'comments' %}
+                        <li><a href="{{ url_for('user_operations.user_page', user_id=user.id, current_mode='comments') }}"><h4>View
+                            Comments</h4></a></li>
+                        {% endif %}
+                        {% if current_mode != 'posts' %}
+                        <li><a href="{{ url_for('user_operations.user_page', user_id=user.id, current_mode='posts') }}"><h4>View
+                            Posts</h4></a></li>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.admin == True %}
+                        <li><a href="{{ url_for('user_operations.delete_user', user_id=user.id) }}"><h4>Delete User</h4></a>
+                        </li>
+                        {% if user.admin == True %}
+                        <li><a href="{{ url_for('verification.admin_auth', user_id=user.id, remove=True) }}"><h4>Remove User as
+                            Administrator</h4></a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.admin == True and user.admin == False or
+                        current_user.is_authenticated and user.admin == False and admin_count < 1 %}
+                        <li><a href="{{ url_for('verification.admin_auth', user_id=user.id) }}"><h4>Make Administrator</h4></a>
+                        </li>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.admin == True and user.author == False and
+                        user.admin == False %}
+                        <li><a href="{{ url_for('user_operations.make_author', user_id=user.id) }}"><h4>Make Author</h4></a>
+                        </li>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.admin == True and user.author == True and
+                        user.admin == False %}
+                        <li><a href="{{ url_for('user_operations.remove_author', user_id=user.id) }}"><h4>Remove User as Author</h4></a>
+                        </li>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.email == user.email and api_exists and
+                        current_mode != "api" or current_user.admin
+                        == True and current_mode != "api" and api_exists %}
+                        <li><a href="{{ url_for('user_operations.user_page', user_id=user.id, current_mode='api') }}"><h4>View API
+                            Information</h4></a>
+                        </li>
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.admin == True and current_mode == 'api' %}
+                        {% if all_posts["description"] != "Blocked" %}
+                        <li><a href="{{ url_for('api.block_key', key_id=all_posts['key_id']) }}"><h4>Block API Key</h4></a>
+                        </li>
+                        {% else %}
+                        <li><a href="{{ url_for('api.unblock_key', key_id=all_posts['key_id']) }}"><h4>Unblock API Key</h4>
+                        </a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                        {% if current_user.is_authenticated and current_user.email == user.email and report_exists and
+                        current_mode != 'delete-report' or current_user.is_authenticated and current_user.admin and
+                        current_mode != 'delete-report'
+                        and report_exists %}
+                        <li><a href="{{ url_for('user_operations.user_page', user_id=user.id, current_mode='delete-report') }}"><h4>View
+                            Pending
+                            Deletion Report</h4></a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    {% if valid %}
+                    {% if posts_count >= 3 or current_mode == 'api' and current_id == 1 and posts_count > 0 and
+                    current_mode != 'delete-report' %}
+                    <a class="btn btn-primary float-right"
+                       href="{{ url_for('user_operations.user_page', page_id=current_id + 1, current_mode=current_mode, user_id=user.id) }}">NEXT
+                        PAGE
+                        &rarr;</a>
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
+                    {% if current_id > 1 %}
+                    <a class="btn btn-primary float-left"
+                       href="{{ url_for('user_operations.user_page', page_id=current_id - 1, current_mode=current_mode, user_id=user.id) }}">&larr;
+                        PREVIOUS PAGE</a>
+                    {% endif %}
+                    {% else %}
+                    {% if posts_count >= 3 %}
+                    <a class="btn btn-primary float-right"
+                       href="{{ url_for('notifications.notifications', page_id=current_id + 1) }}">NEXT
+                        PAGE
+                        &rarr;</a>
+                    {% endif %}
+                    {% if current_id > 1 %}
+                    <a class="btn btn-primary float-left"
+                       href="{{ url_for('notifications.notifications', page_id=current_id - 1) }}">&larr;
+                        PREVIOUS PAGE</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% if notification %}
+        {% if current_id > 1 or posts_count >= 3 %}
+        <hr>
+        {% endif %}
+        {% endif %}
+    </div>
+    {% if notification != True %}
+    <hr>
+    {% endif %}
+</div>
+
+{% include "footer.html" %}
+{% endblock %}

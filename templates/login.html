@@ -1,0 +1,64 @@
+{% extends 'bootstrap/base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+{% include "header.html" %}
+
+<!-- Page Header -->
+<header class="masthead"
+        style="background-image: url({{ background_image }})">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto">
+                <div class="page-heading">
+                    <h1 style="color: {{navbar}}">Log In</h1>
+                    <span class="subheading" style="color: {{navbar}}">Welcome Back!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto content" style="line-height: 2.5;">
+            {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+            <div class="alert alert-{{ category }}" role="alert" style="margin-bottom: 50px;">
+                <center>
+                    {% if message != 'unconfirmed' %}
+                    {% if message == 'Incorrect password, please try again.' %}
+                    <strong>{{message}} <a href="{{ url_for('verification.generate_forget') }}">Forgot your password?</a></strong>
+                    {% else %}
+                    <strong>{{ message }}</strong>
+                    {% endif %}
+                    {% else %}
+                    <strong>This user is not confirmed. <a
+                            href="{{ url_for('login_system.validate', email=email, name=user_name) }}">Click here</a> to
+                        confirm.</strong>
+                    {% endif %}
+                </center>
+            </div>
+            {% endfor %}
+            {% endwith %}
+            {% if forget != True and handling != True %}
+            <p style="color: black;">New to the website? <a href="{{ url_for('login_system.register') }}">Click here</a> to register!
+            </p>
+            {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+            {% else %}
+            {% if handling != True %}
+            <form action="{{ url_for('verification.forget_password', token=token, email=email) }}" method="post" novalidate>
+                {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+                {% else %}
+                <form action="{{ url_for('verification.generate_forget') }}" method="post" novalidate>
+                    {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
+                    {% endif %}
+                    {% endif %}
+        </div>
+    </div>
+</div>
+
+<hr style="margin: 35px 0 20px 0;">
+{% include "footer.html" %}
+{% endblock %}
