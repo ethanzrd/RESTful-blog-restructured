@@ -22,7 +22,7 @@
                             {{original_comment.author.name}}'s Comment on {{original_comment.parent_post.title}}{% endif
                             %}</h2>
                         <span class="meta" style="color: {{navbar}}">{% if comment != True %}Posted{% else %}Commented{% endif %} by
-                <a href="{{ url_for('user_operations.user_page', user_id=post.author.id) }}" style="color: {{navbar}}">{% if comment != True %}{{post.author.name}}{% else %}{{original_comment.author.name}}{% endif %}</a>
+                <a href="{% if comment != True %}{{ url_for('user_operations.user_page', user_id=post.author.id) }}{% else %}{{ url_for('user_operations.user_page', user_id=comment.author.id) }}" style="color: {{navbar}}">{% if comment != True %}{{post.author.name}}{% else %}{{original_comment.author.name}}{% endif %}</a>
                 on {% if comment != True %}{{post.date}}{% else %}{{original_comment.date}}{% endif %}{% if comment == True %}<br><br><a
                                     href="{{ url_for('post.show_post', post_id=post.id) }}"
                                     style="color: {{navbar}}; margin-top: 10px; text-decoration: none;">Back To Post</a>{% endif %}<br><br>{% if current_user.is_authenticated and current_user.admin == True or current_user.is_authenticated and current_user.author == True and post.author.email == current_user.email %}
