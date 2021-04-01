@@ -1,5 +1,5 @@
 from flask import Flask
-from extensions import ckeditor, bootstrap, mail, db, login_manager, search, gravatar
+from extensions import ckeditor, bootstrap, mail, db, login_manager, search, gravatar, csrf_protection
 from context_manager import get_name, get_date, get_background, get_navbar, get_social
 from error_manager import unauthorized, forbidden, not_found, internal_error, bad_request
 from post_system.post.routes import post
@@ -29,6 +29,7 @@ def create_app(config_file='app_config.py'):
     login_manager.init_app(app)
     search.init_app(app)
     gravatar.init_app(app)
+    csrf_protection.init_app(app)
 
     @login_manager.user_loader
     def load_user(user_id):
