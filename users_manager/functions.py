@@ -2,7 +2,7 @@ from flask import flash, url_for, abort
 from flask_login import current_user, logout_user, login_required
 from werkzeug.utils import redirect
 
-from current_user_manager.functions import user_has_api_key, user_has_deletion_request, get_user_api, \
+from users_manager.current_user_manager.functions import user_has_api_key, user_has_deletion_request, get_user_api, \
     get_user_deletion_report
 from extensions import db
 from maintenance import clean_posts
