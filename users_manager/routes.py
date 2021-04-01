@@ -20,7 +20,7 @@ def make_author(user_id):
     if user:
         if not user.author:
             if form.validate_on_submit():
-                make_user_author(user=user, reason=form.reason.data)
+                return make_user_author(user=user, reason=form.reason.data)
             return render_template('admin-form.html', form=form, user_name=user.name, user_id=user_id,
                                    category='author')
         else:

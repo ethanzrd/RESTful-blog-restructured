@@ -374,7 +374,6 @@
                                             PAGE
                                             &rarr;</a>
                                         {% endif %}
-                                        {% if settings == "True" and current_id < 2 %}
                                         {% if mode != 'admin' %}
                                         <a class="btn btn-primary float-right"
                                            href="{{ url_for('user_operations.user_page', page_id=current_id + 1, settings=True, mode=mode) }}">NEXT
@@ -385,7 +384,6 @@
                                            href="{{ url_for('website_settings.menu', page_id=current_id + 1, settings=True, mode=mode) }}">NEXT
                                             PAGE
                                             &rarr;</a>
-                                        {% endif %}
                                         {% endif %}
                                         {% endif %}
                                         {% endif %}
@@ -414,8 +412,8 @@
                                             PREVIOUS PAGE</a>
                                         {% else %}
                                         <a class="btn btn-primary float-left"
-                                           href="{{ url_for('website_settings.menu', page_id=current_id - 1, settings=True, mode=mode) }}">&larr;PREVIOUS
-                                            PAGE</a>
+                                           href="{{ url_for('website_settings.menu', page_id=current_id - 1, settings=True, mode=mode) }}">&larr;
+                                            PREVIOUS PAGE</a>
                                         {% endif %}
                                         {% endif %}
                                         {% endif %}

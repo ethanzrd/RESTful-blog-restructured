@@ -160,3 +160,39 @@ class DeletionRequest(FlaskForm):
                                                                         ('Other', 'Other')])
     explanation = CKEditorField("Could you tell us more?")
     submit = SubmitField("Delete my account", render_kw={"style": "margin-top: 20px;"})
+
+
+class NewsletterSubscriptionForm(FlaskForm):
+    first_name = StringField("First Name", validators=[DataRequired()])
+    last_name = StringField("Last Name", validators=[DataRequired()])
+    email = StringField("Email Address", validators=[DataRequired(), Email()])
+    submit = SubmitField("Subscribe to the newsletter", render_kw={"style": "margin-top: 20px;"})
+
+
+class NewsletterUnsubscribeForm(FlaskForm):
+    email = StringField("Email Address", validators=[DataRequired(), Email()])
+    reason = SelectField("Why are you unsubscribing from the newsletter?", choices=[('Dissatisfied', 'Dissatisfied'),
+                                                                                    (
+                                                                                        'Not Interested',
+                                                                                        'Not Interested'),
+                                                                                    ("Spamming", "Spamming"),
+                                                                                    ('Other', 'Other')])
+    explanation = CKEditorField("Could you tell us more?")
+    submit = SubmitField("Unsubscribe from the newsletter", render_kw={"style": "margin-top: 20px;"})
+
+
+class NewNewsletter(FlaskForm):
+    title = StringField("Newsletter Title", validators=[DataRequired()])
+    contents = CKEditorField("Newsletter Contents", validators=[DataRequired()])
+    submit = SubmitField("Send Newsletter", render_kw={"style": "margin-top: 20px;"})
+
+
+class NewsletterConfigurationForm(FlaskForm):
+    subscription_title = StringField('Subscription Page Title', validators=[DataRequired()])
+    subscription_subtitle = StringField('Subscription Page Subtitle', validators=[DataRequired()])
+    unsubscription_title = StringField("Unsubscription Page Title", validators=[DataRequired()])
+    unsubscription_subtitle = StringField('Unsubscription Page Subtitle', validators=[DataRequired()],
+                                          render_kw={"style": "margin-bottom: 30px;"})
+    authors_allowed = BooleanField('Allow authors to send out newsletters')
+    enabled = BooleanField('Enable Newsletter Functionality')
+    submit = SubmitField("Save Changes", render_kw={"style": "margin-top: 20px;"})

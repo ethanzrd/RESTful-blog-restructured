@@ -1,6 +1,6 @@
 from flask import Flask
 from extensions import ckeditor, bootstrap, mail, db, login_manager, search, gravatar, csrf_protection
-from context_manager import get_name, get_date, get_background, get_navbar, get_social
+from context_manager import get_name, get_date, get_background, get_navbar, get_social, newsletter_functionality
 from error_manager import unauthorized, forbidden, not_found, internal_error, bad_request
 from post_system.post.routes import post
 from post_system.comment.routes import comment
@@ -14,6 +14,7 @@ from contact.routes import contact_routing
 from notification_system.website_notifications.routes import notification_routing
 from website_settings.routes import website_settings
 from login_system.routes import login_system
+from newsletter.routes import newsletter
 from home import home
 
 
@@ -53,6 +54,7 @@ def create_app(config_file='app_config.py'):
     app.register_blueprint(reply)
     app.register_blueprint(website_settings)
     app.register_blueprint(login_system)
+    app.register_blueprint(newsletter)
 
     app.register_error_handler(400, bad_request)
     app.register_error_handler(403, forbidden)
@@ -72,6 +74,7 @@ app.context_processor(get_date)
 app.context_processor(get_background)
 app.context_processor(get_navbar)
 app.context_processor(get_social)
+app.context_processor(newsletter_functionality)
 
 
 if __name__ == '__main__':

@@ -10,7 +10,7 @@
             <div class="col-lg-8 col-md-10 mx-auto">
                 <div class="page-heading">
                     <h1 style="color: {{navbar}}">{{ config_title }}</h1>
-                    <span style="color: {{navbar}}" class="subheading">{{ config_desc }}</span>
+                    <span class="subheading" style="color: {{navbar}}">{{ config_desc }}</span>
                 </div>
             </div>
         </div>
@@ -29,22 +29,30 @@
             </div>
             {% endfor %}
             {% endwith %}
-            {% if config_func == 'web_configuration' %}
-            <p><strong>To remove social icons, type None in the social links fields.</strong></p>
+            {% if config_func == 'newsletter.subscribe' %}
+            <p>Dissatisfied with our newsletter? <a href="{{ url_for('newsletter.unsubscribe') }}"
+                                                    style="text-decoration: None;">Unsubscribe</a></p>
+            {% endif %}
+            {% if config_func == 'website_settings.web_configuration' %}
+            <p><strong>To remove social icons, type None in the social link fields.</strong></p>
             {% endif %}
             {% if config_func == 'comment.edit_comment' %}
             <form action="{{ url_for(config_func, comment_id=comment_id) }}" method="post" novalidate>
                 {% elif config_func == 'reply.edit_reply' %}
                 <form action="{{ url_for(config_func, reply_id=reply_id) }}" method="post" novalidate>
                     {% else %}
-                <form action="{{ url_for(config_func) }}" method="post" novalidate>
-                    {% endif %}
-                    {% if config_func == 'website_settings.api_configuration' %}
-                    <p><strong>Select the allowed routes:</strong></p>
-                    {% endif %}
-                {{ ckeditor.load() }}
-                {{ wtf.quick_form(form=form, button_map={"submit": "primary"}) }}
-            </form>
+                    <form action="{{ url_for(config_func) }}" method="post" novalidate>
+                        {% endif %}
+                        {% if config_func == 'website_settings.api_configuration' %}
+                        <p><strong>Select the allowed routes:</strong></p>
+                        {% endif %}
+                        {% if invalid != True %}
+                        {{ ckeditor.load() }}
+                        {{ wtf.quick_form(form=form, button_map={"submit": "primary"}) }}
+                        {% else %}
+                        <p>This newsletter has no subscribers, newsletters cannot be sent out.</p>
+                        {% endif %}
+                    </form>
         </div>
     </div>
 </div>

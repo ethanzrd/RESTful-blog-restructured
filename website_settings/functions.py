@@ -3,9 +3,9 @@ from flask import abort, url_for, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import redirect
 
-from current_user_manager.functions import user_has_api_key, user_has_deletion_request
+from users_manager.current_user_manager.functions import user_has_api_key, user_has_deletion_request
 from data_manager import get_data, update_data
-from settings import MAX_POSTS_PER_PAGE, CONFIG_KEYS
+from settings import CONFIG_KEYS
 
 from models import Data
 
@@ -37,7 +37,10 @@ def get_options(requested_page: int = 1, website=False):
                                 "func": "website_settings.user_table"},
                             6: {"name": "API Configuration",
                                 "desc": "Configure and manage your API system.",
-                                "func": "website_settings.api_configuration"}
+                                "func": "website_settings.api_configuration"},
+                            7: {"name": "Newsletter Configuration",
+                                "desc": "Configure and manage the built-in newsletter functionality.",
+                                "func": "website_settings.newsletter_configuration"}
                             }
         else:
             return abort(403)

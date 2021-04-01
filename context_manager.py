@@ -60,3 +60,16 @@ def get_social():
                             "youtube": "https://www.youtube.com",
                             "linkedin": "https://www.linkedin.com",
                             "dev": "https://dev.to"})
+
+
+def newsletter_functionality(configuration=None):
+    try:
+        config_data = get_data()["newsletter_configuration"]
+    except KeyError:
+        enabled = False
+    else:
+        try:
+            enabled = config_data["enabled"]
+        except KeyError:
+            enabled = False
+    return dict(newsletter_enabled=enabled) if not configuration else enabled

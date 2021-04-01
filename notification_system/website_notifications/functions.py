@@ -1,6 +1,6 @@
 from flask import abort
 from models import User
-from current_user_manager.functions import get_user_notifications
+from users_manager.current_user_manager.functions import get_user_notifications
 
 
 def get_notifications_dict(user):

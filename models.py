@@ -117,3 +117,14 @@ class Data(db.Model):
     __tablename__ = 'data_table'
     id = db.Column(db.Integer, primary_key=True)
     json_column = db.Column(JSON, nullable=False)
+
+
+class NewsletterSubscription(db.Model):
+    __tablename__ = 'newsletter_subscriptions'
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(300), nullable=False)
+    last_name = db.Column(db.String(300), nullable=False)
+    email = db.Column(db.String(700), nullable=False, unique=True)
+    active = db.Column(db.Boolean(), default=False)
+    unsubscription_reason = db.Column(db.String(700), default='')
+    unsubscription_explanation = db.Column(db.String(3000), default='')

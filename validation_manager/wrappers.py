@@ -1,10 +1,13 @@
 from functools import wraps
 from flask_login import current_user
-from flask import abort, jsonify, request
+from flask import abort, jsonify, request, flash, url_for
+from werkzeug.utils import redirect
 
 from api.functions import is_key_blocked
 from models import ApiKey
 from validation_manager.functions import get_route_status
+from context_manager import newsletter_functionality
+from newsletter.functions import authors_allowed
 
 
 def logout_required(func):
@@ -76,5 +79,37 @@ def validate_api_key(func):
             return func(*args, **kwargs)
         else:
             return jsonify(response={"Malformed API Request": "Invalid API Key."}), 401
+
+    return wrapper
+
+
+def newsletter_route(func):
+    """Checks whether the newsletter functionality is enabled or redirects the user to the home page."""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        functionality = newsletter_functionality('validation')
+        if functionality:
+            return func(*args, **kwargs)
+        else:
+            flash("The newsletter functionality is currently disabled.")
+            return redirect(url_for('home.home_page', category='danger'))
+
+    return wrapper
+
+
+def newsletter_staff(func):
+    """Checks whether the current user matches the permission criteria of sending out newsletters or raises 403."""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        allow_authors = authors_allowed()
+        if current_user.is_authenticated:
+            if current_user.admin or current_user.author and allow_authors:
+                return func(*args, **kwargs)
+            else:
+                return abort(403)
+        else:
+            return abort(403)
 
     return wrapper

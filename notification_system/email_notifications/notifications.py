@@ -1,3 +1,5 @@
+from flask import url_for
+
 from context_manager import get_name
 from notification_system.email_notifications.functions import send_mail
 from flask_mail import Message
@@ -112,4 +114,31 @@ def email_set_as_support_notification(email, link):
                f" To confirm and set this email as the support email, please go to the link below.\n\n" \
                f'{link}.\n\n' \
                f"Note: If you are unfamiliar with the source of this email, simply ignore it."
+    return send_mail(msg)
+
+
+def verify_subscription_notification(email, link):
+    msg = Message(f'Newsletter Subscription Verification', sender=EMAIL, recipients=[email])
+    msg.body = f"Hello, this is an automatic email from {get_name('m')}." \
+               f" This email was used to sign up to a newsletter in {get_name('m')} at {generate_date()}." \
+               f" To confirm and subscribe to our newsletter, please go to the link below.\n\n" \
+               f'{link}.\n\n' \
+               f"Note: If you are unfamiliar with the source of this email, simply ignore it."
+    return send_mail(msg)
+
+
+def verify_unsubscription_notification(email, name, link):
+    msg = Message(f'Newsletter Unsubscription Verification', sender=EMAIL, recipients=[email])
+    msg.body = f"Hello, {name}. We are sorry that you are dissatisfied with our newsletter.\n\n" \
+               f"This is the last step towards unsubscribing from our newsletter, you can re-subscribe at any time." \
+               f" Go to the link below to finalize the unsubscription.\n\n{link}"
+    return send_mail(msg)
+
+
+def newsletter_notification(title, contents, newsletter_recipients):
+    msg = Message(title, sender=EMAIL, recipients=newsletter_recipients)
+    msg.body = f"{contents}\n\nCopyright (C) {get_name('m')} All rights reserved.\n" \
+               f"You received this email because you opted into our newsletter.\n" \
+               f"To unsubscribe from this newsletter, go to the link below:\n\n" \
+               f"{url_for('newsletter.unsubscribe', _external=True)}"
     return send_mail(msg)

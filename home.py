@@ -12,7 +12,7 @@ home = Blueprint('home', __name__)
 @home.route('/')
 @home.route('/<int:page_id>')
 def home_page(page_id=1):
-    category = request.args.get('category')
+    category = request.args.get('category', 'success')
     data = None
     try:
         data = get_data(homepage=True)

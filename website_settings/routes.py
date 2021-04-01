@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, request
 
 from context_manager import get_background
-from current_user_manager.functions import get_full_users_dict
+from users_manager.current_user_manager.functions import get_full_users_dict
 from data_manager import get_data
-from forms import WebConfigForm, ContactConfigForm, AboutConfigForm, AuthConfig, ApiConfig
-from users_manager.functions import get_users_dict, get_users_by_filter, if_unconfirmed_users, delete_unconfirmed_users
+from forms import WebConfigForm, ContactConfigForm, AboutConfigForm, AuthConfig, ApiConfig, NewsletterConfigurationForm
+from users_manager.functions import get_users_by_filter, if_unconfirmed_users, delete_unconfirmed_users
 from utils import handle_page
 from validation_manager.wrappers import admin_only
 from website_settings.functions import load_menu_elements, get_form_elements, update_configuration, \
@@ -88,6 +88,17 @@ def api_configuration():
     return render_template('config.html', config_title="API Configuration",
                            config_desc="Configure the allowed routes for developers.", form=form,
                            config_func="website_settings.api_configuration")
+
+
+@website_settings.route('/newsletter', methods=['GET', 'POST'])
+@admin_only
+def newsletter_configuration():
+    form = NewsletterConfigurationForm(**get_form_elements('newsletter_configuration'))
+    if form.validate_on_submit():
+        return update_configuration('newsletter_configuration', form)
+    return render_template('config.html', config_title="Newsletter Configuration",
+                           config_desc="Configure the primary elements of the built-in newsletter functionality.",
+                           form=form, config_func="website_settings.newsletter_configuration")
 
 
 @website_settings.route('/user-table')

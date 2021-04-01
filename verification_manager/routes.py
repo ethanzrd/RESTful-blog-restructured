@@ -7,9 +7,10 @@ from utils import get_admin_count
 from validation_manager.functions import admin_redirect
 from validation_manager.wrappers import admin_only
 from verification_manager.handle_verification import handle_email_verification, handle_forgot_password, load_token, \
-    handle_support_confirmation, make_user_administrator, remove_administrator, handle_deletion_decision
+    handle_support_confirmation, make_user_administrator, remove_administrator, handle_deletion_decision, \
+    subscription_verification_handling, unsubscription_verification_handling
 from verification_manager.generate_verification import generate_password_reset, redirect_after_verification
-from models import User
+from models import User, NewsletterSubscription
 
 verification = Blueprint('verification', __name__)
 
@@ -146,4 +147,29 @@ def handle_request(token):
         return handle_deletion_decision(requested_user=requested_user, decision=decision, token=token)
     else:
         flash("Could not find a user with the specified ID.")
+        return redirect(url_for('home.home_page', category='danger'))
+
+
+@verification.route('/verify-subscription/<token>')
+def handle_subscription_verification(token):
+    email = request.args.get('email')
+    requested_subscription = NewsletterSubscription.query.filter_by(email=email).first()
+    if requested_subscription:
+        return subscription_verification_handling(requested_subscription=requested_subscription, token=token)
+    else:
+        flash("Could not find a subscription with the specified email.")
+        return redirect(url_for('home.home_page', category='danger'))
+
+
+@verification.route('/verify-unsubscription/<token>')
+def handle_unsubscription_verification(token):
+    email = request.args.get('email')
+    reason = request.args.get('reason', '')
+    explanation = request.args.get('explanation', '')
+    requested_subscription = NewsletterSubscription.query.filter_by(email=email).first()
+    if requested_subscription:
+        return unsubscription_verification_handling(requested_subscription=requested_subscription, token=token,
+                                                    reason=reason, explanation=explanation)
+    else:
+        flash("Could not find a subscription with the specified email.")
         return redirect(url_for('home.home_page', category='danger'))

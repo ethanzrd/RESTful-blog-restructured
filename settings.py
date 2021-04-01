@@ -13,4 +13,7 @@ CONFIG_KEYS = {'about_configuration': ['page_heading', 'page_subheading', 'page_
                                          'linkedin_link', 'instagram_link'],
                'contact_configuration': ['page_heading', 'page_subheading', 'page_description', 'background_image',
                                          'support_email'],
-               'api_configuration': ['all_posts', 'all_users', 'random_post']}
+               'api_configuration': ['all_posts', 'all_users', 'random_post'],
+               'newsletter_configuration': ['subscription_title', 'subscription_subtitle',
+                                            'unsubscription_title', 'unsubscription_subtitle',
+                                            'authors_allowed', 'enabled']}

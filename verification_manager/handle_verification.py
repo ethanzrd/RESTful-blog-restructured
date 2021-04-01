@@ -149,7 +149,39 @@ def handle_rejected_deletion_request(requested_user):
     deletion_request_notification(email=requested_user.email, name=requested_user.name, decision="rejected")
     flash("Deletion request rejected, a notification has been sent to the user.")
     requested_report = DeletionReport.query.filter_by(user=requested_user).first()
-    if requested_report is not None:
+    if requested_report:
         db.session.delete(requested_report)
     db.session.commit()
     return redirect(url_for('home.home_page', category='success'))
+
+
+def subscription_verification_handling(requested_subscription, token):
+    load_token(token=token, salt='subscription-verify')
+    if requested_subscription:
+        if not requested_subscription.active:
+            requested_subscription.active = True
+        else:
+            flash("You've already confirmed your email.")
+            return redirect(url_for('home.home_page', category='success'))
+        db.session.commit()
+        flash("You've confirmed your email successfully.")
+        return redirect(url_for('home.home_page', category='success'))
+    else:
+        return abort(400)
+
+
+def unsubscription_verification_handling(requested_subscription, token, reason, explanation):
+    load_token(token=token, salt='unsubscription-verify')
+    if requested_subscription:
+        if requested_subscription.active:
+            requested_subscription.active = False
+            requested_subscription.unsubscription_reason = reason
+            requested_subscription.unsubscription_explanation = explanation
+            db.session.commit()
+            flash("You've unsubscribed from the newsletter successfully.")
+            return redirect(url_for('home.home_page', category='success'))
+        else:
+            flash("You've already unsubscribed from our newsletter.")
+            return redirect(url_for('home.home_page', category='success'))
+    else:
+        return abort(400)

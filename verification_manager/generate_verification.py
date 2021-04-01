@@ -2,12 +2,12 @@ from flask_login import current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import redirect
 
-from current_user_manager.functions import user_has_deletion_request
+from users_manager.current_user_manager.functions import user_has_deletion_request
 from data_manager import get_data
 from extensions import db
 from models import User, DeletionReport
 from notification_system.email_notifications.notifications import verify_email, reset_password_notification, \
-    email_set_as_support_notification
+    email_set_as_support_notification, verify_subscription_notification, verify_unsubscription_notification
 from settings import serializer
 from flask import url_for, flash, abort
 
@@ -43,9 +43,29 @@ def generate_support_email_verification(email):
     token = serializer.dumps(email, salt='support-verify')
     link = url_for('verification.handle_support_confirmation', token=token, email=email, _external=True)
     status = email_set_as_support_notification(email, link)
-    return "A confirmation email has been sent to the specified support email." if status \
-        else "No sender specified, could not send a confirmation email to the specified support email. " \
-             "Support email unchanged."
+    flash("A confirmation email has been sent to the specified support email." if status
+          else "No sender specified, could not send a confirmation email to the specified support email. "
+               "Support email unchanged.")
+    return redirect(url_for('home.home_page', category='success' if status else 'danger'))
+
+
+def generate_subscription_verification(email):
+    token = serializer.dumps(email, salt='subscription-verify')
+    link = url_for('verification.handle_subscription_verification', token=token, email=email, _external=True)
+    status = verify_subscription_notification(email=email, link=link)
+    flash("A confirmation email has been sent to you." if status
+          else "No sender specified, could not send a confirmation email. Unable to subscribe at this time.")
+    return redirect(url_for('home.home_page', category='success' if status else 'danger'))
+
+
+def generate_unsubscription_verification(email, name, **kwargs):
+    token = serializer.dumps(email, salt='unsubscription-verify')
+    link = url_for('verification.handle_unsubscription_verification', token=token, email=email, _external=True,
+                   **kwargs)
+    status = verify_unsubscription_notification(email=email, link=link, name=name)
+    flash("A confirmation email has been sent to you." if status
+          else "No sender specified, could not send a confirmation email. Unable to subscribe at this time.")
+    return redirect(url_for('home.home_page', category='success' if status else 'danger'))
 
 
 def redirect_after_verification(user_id, password, redirect_to, salt, auth_func):

@@ -16,6 +16,16 @@
                     </li>
                     {% endif %}
                     {% endfor %}
+                    {% if newsletter_enabled %}
+                    <li class="list-inline-item">
+                        <a href="{{ url_for('newsletter.subscribe') }}">
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-circle fa-stack-2x"></i>
+                  <i class="fas fa-newspaper fa-stack-1x fa-inverse"></i>
+                </span>
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
                 <p class="copyright text-muted">{{ year }} &copy; {{ name }}</p>
             </div>
