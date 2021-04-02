@@ -76,7 +76,6 @@ class BlogPost(db.Model):
     author = relationship("User", back_populates="posts")
     title = db.Column(db.String(400), nullable=False)
     subtitle = db.Column(db.String(400), nullable=False)
-    color = db.Column(db.String(200), default='')
     date = db.Column(db.String(400), nullable=False)
     body = db.Column(db.Text, nullable=False)
     img_url = db.Column(db.String(600), nullable=True)

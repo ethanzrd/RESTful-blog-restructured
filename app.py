@@ -1,6 +1,6 @@
 from flask import Flask
 from extensions import ckeditor, bootstrap, mail, db, login_manager, search, gravatar, csrf_protection
-from context_manager import get_name, get_date, get_background, get_navbar, get_social, newsletter_functionality
+from context_manager import get_name, get_date, get_background, get_social, newsletter_functionality
 from error_manager import unauthorized, forbidden, not_found, internal_error, bad_request
 from post_system.post.routes import post
 from post_system.comment.routes import comment
@@ -72,7 +72,6 @@ db.create_all()
 app.context_processor(get_name)
 app.context_processor(get_date)
 app.context_processor(get_background)
-app.context_processor(get_navbar)
 app.context_processor(get_social)
 app.context_processor(newsletter_functionality)
 

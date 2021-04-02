@@ -15,7 +15,6 @@ def get_data(homepage=False):  # GET CONFIG DATA
                             "name": "Website",
                             "homepage_title": "A website",
                             "homepage_subtitle": "A fully fledged website",
-                            "navigation_bar_color": "#ffffff",
                             "background_image": "https://www.panggi.com/images/featured/python.png",
                             "twitter_link": "https://www.twitter.com",
                             "github_link": "https://www.github.com",

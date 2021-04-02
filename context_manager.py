@@ -34,14 +34,6 @@ def get_background(configuration='website_configuration'):
         return dict(background_image="")
 
 
-def get_navbar(configuration=None):
-    try:
-        return dict(navbar=get_data()["website_configuration"]["navigation_bar_color"]) if configuration is None else \
-            get_data()["website_configuration"]["navigation_bar_color"]
-    except (KeyError, TypeError):
-        return dict(navbar='#FFFFFF') if configuration is None else '#FFFFFF'
-
-
 def get_social():
     try:
         soc = get_data()["website_configuration"]

@@ -3,8 +3,6 @@ from extensions import db
 from models import Notification, Comment, DeletedPost, Reply
 from flask import redirect, url_for, flash, abort, render_template
 from utils import generate_date
-from context_manager import get_navbar
-from html2text import html2text
 from maintenance import clean_notifications
 
 
@@ -51,15 +49,13 @@ def get_comment_elements(comment_id, deleted, post_id):
                                          if comment['comment_id'] == comment_id][0]
                     replies = requested_comment["replies"]
                     parent_post = requested_post
-                    navbar = requested_post[1]["color"] if requested_post[1]["color"] != '' else get_navbar()
                 else:
                     return abort(400)
             else:
                 requested_comment = get_comment(comment_id)
                 replies = requested_comment.replies
                 parent_post = requested_comment.parent_post
-                navbar = parent_post.color if parent_post.color != '' else get_navbar()
-            return requested_comment, replies, parent_post, navbar
+            return requested_comment, replies, parent_post
         except (AttributeError, IndexError, KeyError):
             return abort(404)
     else:

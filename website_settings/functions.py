@@ -116,12 +116,11 @@ def update_configuration(configuration, form, new_email=False, flash_message=Non
         return abort(400)
     else:
         new_data = {configuration: {
-            key: form[key].data if key != 'navigation_bar_color' else form[key].data.hex
-            if key != 'support_email' and new_email is False else data[configuration]['support_email']
+            key: form[key].data if key != 'support_email' and new_email is False
+            else data[configuration]['support_email']
             for key in keys
         }}
         new_configuration = new_data[configuration]
-        changes_lst = []
         keys_lst = list(new_configuration.keys())
         values_lst = list(new_configuration.values())
         log_changes(configuration=configuration, new_configuration=new_configuration, keys_lst=keys_lst,

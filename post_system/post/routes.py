@@ -8,8 +8,6 @@ from post_system.post.functions import get_post_elements, post_addition, post_ed
     post_recovery, post_permanent_deletion
 from utils import handle_page
 from validation_manager.wrappers import staff_only, admin_only
-from context_manager import get_navbar
-
 post = Blueprint('post', __name__, url_prefix='/post')
 
 
@@ -18,10 +16,10 @@ def show_post(post_id):
     deleted = request.args.get('deleted')
     comment_page = request.args.get('c_page', 1)
     form = CommentForm()
-    requested_post, post_comments, navbar = get_post_elements(post_id, deleted)
+    requested_post, post_comments = get_post_elements(post_id, deleted)
     if form.validate_on_submit():
         return add_comment(requested_post, form.comment.data)
-    return handle_page("post.html", post=requested_post, deleted=str(deleted), post_id=post_id, navbar=navbar,
+    return handle_page("post.html", post=requested_post, deleted=str(deleted), post_id=post_id,
                        form=form, items_arg='comments', count_arg='c_count', items_lst=post_comments,
                        page_arg='current_c', page_id=comment_page)
 
@@ -29,7 +27,7 @@ def show_post(post_id):
 @post.route('/add', methods=['GET', 'POST'])
 @staff_only
 def add_post():
-    form = CreatePostForm(navigation_bar_color=get_navbar('p'))
+    form = CreatePostForm()
     if form.validate_on_submit():
         return post_addition(form)
     return render_template('make-post.html', form=form)
@@ -45,7 +43,6 @@ def edit_post(post_id):
                 form = CreatePostForm(title=requested_post.title,
                                       subtitle=requested_post.subtitle,
                                       img_url=requested_post.img_url,
-                                      navigation_bar_color=requested_post.color,
                                       body=requested_post.body)
                 if form.validate_on_submit():
                     return post_edition(requested_post=requested_post, form=form, request='POST')

@@ -14,15 +14,15 @@
             <div class="row">
                 <div class="col-lg-8 col-md-10 mx-auto">
                     {% if deleted != "True" %}
-                    <div class="post-heading" style="color: {{navbar}}">
+                    <div class="post-heading">
                         <h1>{% if comment != True %}{{post.title}}{% else %}{{original_comment.author.name}}'s Comment{%
                             endif %}</h1>
-                        <h2 class="subheading" style="color: {{navbar}}">{% if comment != True %}{{post.subtitle}}{%
+                        <h2 class="subheading">{% if comment != True %}{{post.subtitle}}{%
                             else %}Viewing
                             {{original_comment.author.name}}'s Comment on {{original_comment.parent_post.title}}{% endif
                             %}</h2>
-                        <span class="meta" style="color: {{navbar}}">{% if comment != True %}Posted{% else %}Commented{% endif %} by
-                <a href="{% if comment != True %}{{ url_for('user_operations.user_page', user_id=post.author.id) }}{% else %}{{ url_for('user_operations.user_page', user_id=original_comment.author.id) }}{% endif %}" style="color: {{navbar}}">{% if comment != True %}{{post.author.name}}{% else %}{{original_comment.author.name}}{% endif %}</a>
+                        <span class="meta">{% if comment != True %}Posted{% else %}Commented{% endif %} by
+                <a href="{% if comment != True %}{{ url_for('user_operations.user_page', user_id=post.author.id) }}{% else %}{{ url_for('user_operations.user_page', user_id=original_comment.author.id) }}{% endif %}">{% if comment != True %}{{post.author.name}}{% else %}{{original_comment.author.name}}{% endif %}</a>
                 on {% if comment != True %}{{post.date}}{% else %}{{original_comment.date}}{% endif %}{% if comment == True %}<br><br><a
                                     href="{{ url_for('post.show_post', post_id=post.id) }}"
                                     style="color: {{navbar}}; margin-top: 10px; text-decoration: none;">Back To Post</a>{% endif %}<br><br>{% if current_user.is_authenticated and current_user.admin == True or current_user.is_authenticated and current_user.author == True and post.author.email == current_user.email %}
@@ -40,19 +40,19 @@
                         {% endif %}
                         {% endif %}
                         {% else %}
-                        <div class="post-heading" style="color: {{navbar}}">
-                            <h1 style="color: {{navbar}}">{% if comment != True %}{{post[1]["post_title"]}}{% else
+                        <div class="post-heading">
+                            <h1>{% if comment != True %}{{post[1]["post_title"]}}{% else
                                 %}{{original_comment["author"]}}'s Comment{% endif %}</h1>
-                            <h2 class="subheading" style="color: {{navbar}}">{% if comment != True
+                            <h2 class="subheading">{% if comment != True
                                 %}{{post[1]["subtitle"]}}{% else %}Viewing
                                 {{original_comment["author"]}}'s Comment on {{post[1]["post_title"]}}{% endif %}</h2>
-                            <span class="meta" style="color: {{navbar}}">{% if comment != True %}Posted{% else %}Commented{% endif %} by
-              <a href="{{ url_for('user_operations.user_page', user_id=post[1]['author_id']) }}" style="color: {{navbar}}">{% if comment != True %}{{post[1]["author"]}}{% else %}{{original_comment["author"]}}{% endif %}</a>
+                            <span class="meta">{% if comment != True %}Posted{% else %}Commented{% endif %} by
+              <a href="{{ url_for('user_operations.user_page', user_id=post[1]['author_id']) }}">{% if comment != True %}{{post[1]["author"]}}{% else %}{{original_comment["author"]}}{% endif %}</a>
               on {% if comment != True %}{{post[1]["date"]}}{% else %}{{post[1]["post_title"]}}{% endif %}{% if comment != True and current_user.is_authenticated and current_user.admin == True and current_user.email == post[1]["author_email"] or comment != True and current_user.is_authenticated and current_user.author == True and current_user.email == post[1]["author_email"] %}<br><br>
                         <a href="{{ url_for('post.recover_post', post_id=post[0]) }}"
-                           style="color: {{navbar}}">Recover Post</a>{% endif %}
+                        >Recover Post</a>{% endif %}
                         {% if comment != True and current_user.is_authenticated and current_user.admin == True %}<br><br><a
-                                        href="{{ url_for('post.perm_delete', post_id=post[0]) }}" style="color: {{navbar}}">Permanently Delete Post</a>{% endif %}{% if comment == True %}<br><br><a
+                                        href="{{ url_for('post.perm_delete', post_id=post[0]) }}">Permanently Delete Post</a>{% endif %}{% if comment == True %}<br><br><a
                                         href="{{ url_for('post.show_post', post_id=post[0], deleted='True') }}"
                                         style="color: {{navbar}}; margin-top: 10px; text-decoration: none;">Back To Post</a>{% endif %}</span>
                         </div>
@@ -98,7 +98,8 @@
                     {% if not current_user.is_authenticated and deleted != "True" and current_c == 1 %}
                     {% set horizontal = True %}
                     <hr style="margin: 50px 0 0 0;">
-                    <p><a href="{{ url_for('login_system.login') }}" style="text-decoration: none;">Log in</a> to comment.</p>
+                    <p><a href="{{ url_for('login_system.login') }}" style="text-decoration: none;">Log in</a> to
+                        comment.</p>
                     <hr style="margin: 30px 0 20px 0;">
                     {% endif %}
                     {% if horizontal == False %}

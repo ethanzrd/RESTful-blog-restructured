@@ -17,12 +17,12 @@ def show_comment(comment_id):
     reply_page = request.args.get('c_page', 1)
     deleted = request.args.get('deleted')
     post_id = request.args.get('post_id')
-    requested_comment, replies, parent_post, navbar = get_comment_elements(comment_id, deleted, post_id)
+    requested_comment, replies, parent_post = get_comment_elements(comment_id, deleted, post_id)
     if form.validate_on_submit():
         return add_reply(requested_comment, form.reply.data, reply_page)
     return handle_page(endpoint='post.html', count_arg='c_count', page_id=reply_page, page_arg='current_c',
                        items_lst=replies, items_arg='replies', original_comment=requested_comment, post=parent_post,
-                       comments=[requested_comment], form=form, deleted=str(deleted), post_id=post_id, navbar=navbar,
+                       comments=[requested_comment], form=form, deleted=str(deleted), post_id=post_id,
                        comment=True)
 
 

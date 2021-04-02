@@ -4,7 +4,6 @@ from werkzeug.utils import redirect
 from models import BlogPost, DeletedPost, Comment, Reply, User
 from html2text import html2text
 from flask import abort, url_for, render_template
-from context_manager import get_navbar
 from utils import generate_date
 from flask_login import current_user
 from extensions import db
@@ -47,7 +46,6 @@ def get_full_post_dict(requested_post):
             "author_id": requested_post.author.id,
             "author_email": requested_post.author.email,
             "author": requested_post.author.name,
-            "color": requested_post.color,
             "subtitle": requested_post.subtitle,
             "img_url": requested_post.img_url,
             "body": requested_post.body,
@@ -69,21 +67,18 @@ def get_post_elements(post_id, deleted=None):
         if not deleted:
             requested_post = BlogPost.query.get(post_id)
             post_comments = BlogPost.query.get(post_id).comments
-            navbar = requested_post.color if requested_post.color else get_navbar()
         else:
             requested_post = (DeletedPost.query.get(post_id).id, DeletedPost.query.get(post_id).json_column)
-            navbar = requested_post[1]["color"] if requested_post[1]["color"] else get_navbar()
             post_comments = requested_post[1]["comments"]
     except (AttributeError, IndexError):
         return abort(404)
-    return requested_post, post_comments, navbar
+    return requested_post, post_comments
 
 
 def post_addition(form):
     new_post = BlogPost(title=form.title.data,
                         subtitle=form.subtitle.data,
                         author=current_user,
-                        color=form.navigation_bar_color.data.hex,
                         img_url=form.img_url.data,
                         body=form.body.data,
                         date=generate_date())
@@ -101,7 +96,6 @@ def post_edition(requested_post, form, request='GET'):
         requested_post.title = form.title.data
         requested_post.subtitle = form.subtitle.data
         requested_post.img_url = form.img_url.data
-        requested_post.color = form.navigation_bar_color.data.hex
         requested_post.body = form.body.data
         db.session.commit()
         return redirect(url_for('post.show_post', post_id=post_id))
@@ -138,7 +132,7 @@ def post_deletion(requested_post):
 
 def post_recovery(database_entry, requested_post):
     try:
-        if current_user.email != requested_post["author_email"]\
+        if current_user.email != requested_post["author_email"] \
                 or current_user.author is False and current_user.admin is False:
             return abort(403)
     except AttributeError:
@@ -149,7 +143,6 @@ def post_recovery(database_entry, requested_post):
     new_post = BlogPost(author=User.query.filter_by(email=requested_post["author_email"]).first(),
                         title=requested_post["post_title"],
                         subtitle=requested_post["subtitle"],
-                        color=requested_post["color"],
                         date=requested_post["date"],
                         body=requested_post["body"],
                         img_url=requested_post["img_url"],
