@@ -35,8 +35,10 @@ def log_changes(configuration, new_configuration, keys_lst, values_lst):
             if values_lst[index] != previous_version:
                 changes_lst.append(f"{current_key}: {previous_version} -> {values_lst[index]}")
     changes = '<br><br>'.join(changes_lst)
-    new_log = Log(user=current_user, user_name=current_user.name, category='configuration',
-                  description=f"{current_user.name} configured the {' '.join(configuration.split('_')).title()}.<br><br>"
-                              f"Changes:<br><br>{changes}", date=generate_date(), user_email=current_user.email)
-    db.session.add(new_log)
-    db.session.commit()
+    if any(changes_lst):
+        new_log = Log(user=current_user, user_name=current_user.name, category='configuration',
+                      description=f"{current_user.name} configured the {' '.join(configuration.split('_')).title()}."
+                                  f"<br><br>"
+                                  f"Changes:<br><br>{changes}", date=generate_date(), user_email=current_user.email)
+        db.session.add(new_log)
+        db.session.commit()
