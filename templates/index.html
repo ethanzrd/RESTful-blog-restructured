@@ -375,7 +375,7 @@
                                         <li><a href="{{ url_for('post.deleted_posts') }}"><h4>Recover Deleted Posts</h4>
                                         </a>
                                         </li>
-                                        {% if newsletter_functionality and current_user.author and authors_allowed or newsletter_functionality and current_user.admin %}
+                                        {% if newsletter_enabled and current_user.author and authors_allowed or newsletter_enabled and current_user.admin %}
                                         <li><a href="{{ url_for('newsletter.send_newsletter') }}"><h4>Send
                                             Newsletter</h4></a></li>
                                         {% endif %}
