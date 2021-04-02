@@ -19,7 +19,7 @@ def get_data(homepage=False):  # GET CONFIG DATA
                             "background_image": "https://www.panggi.com/images/featured/python.png",
                             "twitter_link": "https://www.twitter.com",
                             "github_link": "https://www.github.com",
-                            "facebook_link": "https://www.github.com",
+                            "facebook_link": "https://www.facebook.com",
                             "instagram_link": "https://www.instagram.com",
                             "youtube_link": "https://www.youtube.com",
                             "linkedin_link": "https://www.linkedin.com",
