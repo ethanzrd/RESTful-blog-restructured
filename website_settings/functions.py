@@ -3,6 +3,8 @@ from flask import abort, url_for, flash
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import redirect
 
+from extensions import db
+from logs.functions import log_changes
 from users_manager.current_user_manager.functions import user_has_api_key, user_has_deletion_request
 from data_manager import get_data, update_data
 from settings import CONFIG_KEYS
@@ -10,7 +12,7 @@ from settings import CONFIG_KEYS
 from models import Data
 
 
-def get_options(requested_page: int = 1, website=False):
+def get_options(website=False):
     def get_last(given_options: dict):
         try:
             use_id = list(given_options.keys())[-1] + 1
@@ -40,7 +42,13 @@ def get_options(requested_page: int = 1, website=False):
                                 "func": "website_settings.api_configuration"},
                             7: {"name": "Newsletter Configuration",
                                 "desc": "Configure and manage the built-in newsletter functionality.",
-                                "func": "website_settings.newsletter_configuration"}
+                                "func": "website_settings.newsletter_configuration"},
+                            8: {"name": "Website Logs",
+                                "desc": "Visualize all of your website logs effortlessly.",
+                                "func": "website_settings.logs"},
+                            9: {"name": "Newsletter Subscribers Database",
+                                "desc": "Visualize all of your newsletter subscribers effortlessly.",
+                                "func": "website_settings.newsletter_subscribers_table"}
                             }
         else:
             return abort(403)
@@ -112,6 +120,12 @@ def update_configuration(configuration, form, new_email=False, flash_message=Non
             if key != 'support_email' and new_email is False else data[configuration]['support_email']
             for key in keys
         }}
+        new_configuration = new_data[configuration]
+        changes_lst = []
+        keys_lst = list(new_configuration.keys())
+        values_lst = list(new_configuration.values())
+        log_changes(configuration=configuration, new_configuration=new_configuration, keys_lst=keys_lst,
+                    values_lst=values_lst)
         data.update(new_data)
         update_data(data)
         flash(flash_message) if flash_message else None

@@ -103,7 +103,7 @@ def newsletter_staff(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        allow_authors = authors_allowed()
+        allow_authors = authors_allowed('validation')
         if current_user.is_authenticated:
             if current_user.admin or current_user.author and allow_authors:
                 return func(*args, **kwargs)

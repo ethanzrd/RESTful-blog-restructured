@@ -50,7 +50,11 @@
                         {{ ckeditor.load() }}
                         {{ wtf.quick_form(form=form, button_map={"submit": "primary"}) }}
                         {% else %}
-                        <p>This newsletter has no subscribers, newsletters cannot be sent out.</p>
+                        <div class="alert alert-danger" role="alert">
+                            <center>
+                                <strong>This newsletter has no subscribers, newsletters cannot be sent.</strong>
+                            </center>
+                        </div>
                         {% endif %}
                     </form>
         </div>

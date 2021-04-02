@@ -38,6 +38,8 @@
                 </div>
                 {% endfor %}
                 {% endwith %}
+                {% if newsletter_table != "True" %}
+                {% if logs != "True" %}
                 {% if user_table != "True" %}
                 {% if mode != 'users' %}
                 {% if deleted != "True" %}
@@ -259,7 +261,101 @@
                             {% endfor %}
                             {% endif %}
                             {% endif %}
+                            {% else %}
+                            {% if posts_count != 0 %}
+                            {% for log in log_items %}
+                            <ul class="commentList" style="list-style-type: none; margin-top: 15px;">
+                                <li>
+                                    <div class="commenterImage">
+                                        <img src="{{ log.user_email | gravatar }}"
+                                             style="border-radius: 100px;"/>
+                                    </div>
+                                    <div>
 
+                                <span class="date sub-text" style="margin-left: 10px; font-size: 15px; color: #025955;">{% if log.user != None %}<a
+                                        href="{{ url_for('user_operations.user_page', user_id=log.user_id) }}"
+                                        style="text-decoration: none;">{{ log.user_name }}</a>{% else %}{{ log.user_name }} (Deleted User) {% endif %} | {{ log.date }}</span>
+                                        <span style="margin-left: 20px;"><br><br>{{ log.description|safe() }}<br><br></span>
+                                    </div>
+                                </li>
+                            </ul>
+                            <hr style="margin: 20px 0 10px 0;">
+                            {% endfor %}
+                            {% else %}
+                            {% set valid = False %}
+                            {% for i in range(3): %}
+                            <div class="post-preview">
+                                <a href="#">
+                                    <h2 class="post-title">
+                                        Nothing to show here.
+                                    </h2>
+                                    <h3 class="post-subtitle">
+                                        Looks like there's nothing here.
+                                    </h3>
+                                </a>
+                                <p class="post-meta">
+                                    <a href="#">You've reached a dead end, my friend.</a>
+                                </p>
+                            </div>
+                            <hr>
+                            {% endfor %}
+                            {% endif %}
+                            {% endif %}
+                            {% else %}
+                            {% if posts_count != 0 %}
+                            {% for subscriber in subscribers %}
+                            <div class="post-preview">
+                                <a href="{% if not subscriber['signed_up'] %}#{% else %}{{ url_for('user_operations.user_page', user_id=subscriber['signed_up'].id) }}{% endif %}">
+                                    <h2 class="post-title">
+                                        {{subscriber['first_name']}} {{subscriber['last_name']}}
+                                    </h2>
+                                    <h3 class="post-subtitle" style="margin-top: 30px;">
+
+                                    </h3>
+                                </a>
+                                <p class="post-meta">
+                                    Email Address: {{subscriber['email']}}
+                                </p>
+                                <p class="post-meta">
+                                    Registered Blog User: {% if subscriber['signed_up'] %}True{% else %}False{% endif %}
+                                </p>
+                                <p class="post-meta">
+                                    Subscribed on: {{subscriber['date']}}
+                                </p>
+                                {% if subscriber.active != True %}
+                                <p>
+                                    Unsubscription Reason: {{subscriber['unsubscription_date']}}
+                                </p>
+                                <p>
+                                    Additional Unsubscription Info: {{subscriber['unsubscription_explanation']}}
+                                </p>
+                                <p>
+                                    Unsubscribed on: {{subscriber['unsubscription_date']}}
+                                </p>
+                                {% endif %}
+                            </div>
+                            <hr>
+                            {% endfor %}
+                            {% else %}
+                            {% set valid = False %}
+                            {% for i in range(3): %}
+                            <div class="post-preview">
+                                <a href="#">
+                                    <h2 class="post-title">
+                                        Nothing to show here.
+                                    </h2>
+                                    <h3 class="post-subtitle">
+                                        Looks like there's nothing here.
+                                    </h3>
+                                </a>
+                                <p class="post-meta">
+                                    <a href="#">You've reached a dead end, my friend.</a>
+                                </p>
+                            </div>
+                            <hr>
+                            {% endfor %}
+                            {% endif %}
+                            {% endif %}
                             <!-- New Post -->
                             <div class="clearfix">
                                 {% if current_id == 1 %}
@@ -267,7 +363,7 @@
                                 {% if current_user.is_authenticated %}
                                 {% if search != True %}
                                 {% set hr_valid = True %}
-                                {% if user_table != 'True' %}
+                                {% if user_table != 'True' and logs != 'True' and newsletter_table != 'True' %}
                                 {% if settings != "True" %}
                                 <div class="dropdown">
                                     <button class="btn btn-primary float-left" data-toggle="dropdown" type="button">
@@ -279,6 +375,10 @@
                                         <li><a href="{{ url_for('post.deleted_posts') }}"><h4>Recover Deleted Posts</h4>
                                         </a>
                                         </li>
+                                        {% if authors_allowed %}
+                                        <li><a href="{{ url_for('newsletter.send_newsletter') }}"><h4>Send
+                                            Newsletter</h4></a></li>
+                                        {% endif %}
                                         {% endif %}
                                         {% if current_user.admin == True %}
                                         <li><a href="{{ url_for('website_settings.menu', mode='admin') }}"><h4>
@@ -303,6 +403,7 @@
                                             PANEL
                                             <span class="caret"></span></button>
                                         <ul class="dropdown-menu">
+                                            {% if user_table == 'True' %}
                                             {% if current_view != None %}
                                             <li><a href="{{ url_for('website_settings.user_table') }}"><h4>View All
                                                 Users</h4>
@@ -347,6 +448,47 @@
                                                     Remove unconfirmed users</h4></a>
                                             </li>
                                             {% endif %}
+                                            {% endif %}
+                                            {% if logs == 'True' %}
+                                            {% if current_view != None %}
+                                            <li>
+                                                <a href="{{ url_for('website_settings.logs') }}">
+                                                    <h4>View All Logs</h4></a>
+                                            </li>
+                                            {% endif %}
+                                            {% if current_view != 'newsletter' %}
+                                            <li>
+                                                <a href="{{ url_for('website_settings.logs', view_filter='newsletter') }}">
+                                                    <h4>View Newsletter Sendout Logs Only</h4></a>
+                                            </li>
+                                            {% endif %}
+                                            {% if current_view != 'configuration' %}
+                                            <li>
+                                                <a href="{{ url_for('website_settings.logs', view_filter='configuration') }}">
+                                                    <h4>View Configuration Logs Only</h4></a>
+                                            </li>
+                                            {% endif %}
+                                            {% endif %}
+                                            {% if newsletter_table == 'True' %}
+                                            {% if current_view != 'inactive' %}
+                                            <li>
+                                                <a href="{{ url_for('website_settings.newsletter_subscribers_table', view_filter='inactive') }}">
+                                                    <h4>View Unsubscribed Users Only</h4></a>
+                                            </li>
+                                            {% endif %}
+                                            {% if current_view != 'active' %}
+                                            <li>
+                                                <a href="{{ url_for('website_settings.newsletter_subscribers_table', view_filter='active') }}">
+                                                    <h4>View Subscribed Users Only</h4></a>
+                                            </li>
+                                            {% endif %}
+                                            {% if current_view != None %}
+                                            <li>
+                                                <a href="{{ url_for('website_settings.newsletter_subscribers_table') }}">
+                                                    <h4>View All Users</h4></a>
+                                            </li>
+                                            {% endif %}
+                                            {% endif %}
                                         </ul>
                                         {% endif %}
                                         {% endif %}
@@ -356,7 +498,8 @@
                                         {% if valid %}
                                         {% if posts_count >= 3 %}
                                         {% set hr_valid = True %}
-                                        {% if deleted != "True" and user_table != "True" and settings != "True" %}
+                                        {% if deleted != "True" and user_table != "True" and settings != "True" and logs
+                                        != 'True' and newsletter_table != 'True' %}
                                         <a class="btn btn-primary float-right"
                                            href="{{ url_for('home.home_page', page_id=current_id + 1) }}">NEXT
                                             PAGE
@@ -368,12 +511,25 @@
                                             PAGE
                                             &rarr;</a>
                                         {% endif %}
+                                        {% if logs == 'True' %}
+                                        <a class="btn btn-primary float-right"
+                                           href="{{ url_for('website_settings.logs', page_id=current_id + 1, view_filter=current_view) }}">NEXT
+                                            PAGE
+                                            &rarr;</a>
+                                        {% endif %}
                                         {% if user_table == "True" %}
                                         <a class="btn btn-primary float-right"
                                            href="{{ url_for('website_settings.user_table', page_id=current_id + 1, table_page=True, view_filter=current_view) }}">NEXT
                                             PAGE
                                             &rarr;</a>
                                         {% endif %}
+                                        {% if newsletter_table == 'True' %}
+                                        <a class="btn btn-primary float-right"
+                                           href="{{ url_for('website_settings.newsletter_subscribers_table', page_id=current_id + 1, view_filter=current_view) }}">NEXT
+                                            PAGE
+                                            &rarr;</a>
+                                        {% endif %}
+                                        {% if settings == 'True' and current_id < 3 %}
                                         {% if mode != 'admin' %}
                                         <a class="btn btn-primary float-right"
                                            href="{{ url_for('user_operations.user_page', page_id=current_id + 1, settings=True, mode=mode) }}">NEXT
@@ -388,9 +544,11 @@
                                         {% endif %}
                                         {% endif %}
                                         {% endif %}
+                                        {% endif %}
                                         {% if current_id > 1 %}
                                         {% set hr_valid = True %}
-                                        {% if deleted != "True" and user_table != "True" and settings != "True" %}
+                                        {% if deleted != "True" and user_table != "True" and settings != "True" and logs
+                                        != "True" and newsletter_table != 'True' %}
                                         <a class="btn btn-primary float-left"
                                            href="{{ url_for('home.home_page', page_id=current_id - 1) }}">&larr;
                                             PREVIOUS PAGE</a>
@@ -403,6 +561,16 @@
                                         {% if user_table == "True" %}
                                         <a class="btn btn-primary float-left"
                                            href="{{ url_for('website_settings.user_table', page_id=current_id - 1, table_page=True, view_filter=current_view) }}">&larr;
+                                            PREVIOUS PAGE</a>
+                                        {% endif %}
+                                        {% if logs == 'True' %}
+                                        <a class="btn btn-primary float-left"
+                                           href="{{ url_for('website_settings.logs', page_id=current_id - 1, view_filter=current_view) }}">&larr;
+                                            PREVIOUS PAGE</a>
+                                        {% endif %}
+                                        {% if newsletter_table == 'True' %}
+                                        <a class="btn btn-primary float-left"
+                                           href="{{ url_for('website_settings.newsletter_subscribers_table', page_id=current_id - 1, view_filter=current_view) }}">&larr;
                                             PREVIOUS PAGE</a>
                                         {% endif %}
                                         {% if settings == "True" %}

@@ -22,6 +22,7 @@ class User(UserMixin, db.Model):
     api_key = relationship("ApiKey", back_populates="developer")
     deletion_report = relationship('DeletionReport', back_populates='user')
     notifications = relationship("Notification", back_populates='user')
+    logs = relationship("Log", back_populates='user')
 
 
 class DeletionReport(db.Model):
@@ -128,3 +129,17 @@ class NewsletterSubscription(db.Model):
     active = db.Column(db.Boolean(), default=False)
     unsubscription_reason = db.Column(db.String(700), default='')
     unsubscription_explanation = db.Column(db.String(3000), default='')
+    unsubscription_date = db.Column(db.String(300), default='')
+    date = db.Column(db.String(300), nullable=False)
+
+
+class Log(db.Model):
+    __tablename__ = 'logs'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = relationship("User", back_populates='logs')
+    category = db.Column(db.String(700), nullable=False)
+    description = db.Column(db.String(1200), nullable=False)
+    user_name = db.Column(db.String(700), nullable=False)
+    user_email = db.Column(db.String(700), nullable=False)
+    date = db.Column(db.String(700), nullable=False)

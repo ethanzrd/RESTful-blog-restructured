@@ -2,6 +2,7 @@ from flask import Blueprint, request
 from sqlalchemy.exc import OperationalError
 from data_manager import get_data
 from extensions import db
+from newsletter.functions import authors_allowed
 from utils import handle_page
 from post_system.post.functions import get_posts
 
@@ -20,3 +21,6 @@ def home_page(page_id=1):
         db.create_all()
     return handle_page(endpoint="index.html", items_arg='all_posts', items_lst=get_posts(),
                        page_id=page_id, title=data[0], subtitle=data[1], category=category)
+
+
+home.context_processor(authors_allowed)

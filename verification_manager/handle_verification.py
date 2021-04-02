@@ -177,6 +177,7 @@ def unsubscription_verification_handling(requested_subscription, token, reason, 
             requested_subscription.active = False
             requested_subscription.unsubscription_reason = reason
             requested_subscription.unsubscription_explanation = explanation
+            requested_subscription.unsubscription_date = generate_date()
             db.session.commit()
             flash("You've unsubscribed from the newsletter successfully.")
             return redirect(url_for('home.home_page', category='success'))

@@ -30,6 +30,14 @@ def get_data(homepage=False):  # GET CONFIG DATA
                             "all_users": True,
                             "random_post": True
                         },
+                        "newsletter_configuration": {
+                            'subscription_title': 'Subscribe to our newsletter!',
+                            'subscription_subtitle': 'Get all of our internet doses!',
+                            'unsubscription_title': 'Unsubscribe from our newsletter',
+                            'unsubscription_subtitle': 'Dissatisfied with our newsletter? Unsubscribe here.',
+                            'authors_allowed': False,
+                            'enabled': False
+                        },
                         "contact_configuration": {
                             "page_heading": "Contact us",
                             "page_subheading": "Contact us, and we'll respond as soon as we can.",

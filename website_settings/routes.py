@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
 
 from context_manager import get_background
+from newsletter.functions import get_subscribers_by_filter, get_subscribers_dict
 from users_manager.current_user_manager.functions import get_full_users_dict
 from data_manager import get_data
 from forms import WebConfigForm, ContactConfigForm, AboutConfigForm, AuthConfig, ApiConfig, NewsletterConfigurationForm
@@ -9,6 +10,7 @@ from utils import handle_page
 from validation_manager.wrappers import admin_only
 from website_settings.functions import load_menu_elements, get_form_elements, update_configuration, \
     update_authentication_password
+from logs.functions import get_logs_by_filter
 from verification_manager.generate_verification import generate_support_email_verification
 
 website_settings = Blueprint('website_settings', __name__, url_prefix='/settings')
@@ -111,6 +113,29 @@ def user_table(page_id=1):
     return handle_page(endpoint='index.html', items_lst=list(users_dict.values()), page_id=page_id, user_table="True",
                        title="User Database Table", subtitle="Visualize your user database effortlessly.",
                        current_view=view_filter, unconfirmed=if_unconfirmed_users(), items_arg='users')
+
+
+@website_settings.route('/logs')
+@website_settings.route('/logs/<int:page_id>')
+@admin_only
+def logs(page_id=1):
+    view_filter = request.args.get('view_filter')
+    requested_logs = get_logs_by_filter(view_filter)
+    return handle_page(endpoint='index.html', logs="True", items_lst=requested_logs, page_id=page_id,
+                       items_arg='log_items', title='Website Logs', current_view=view_filter,
+                       subtitle='View all of the website logs.')
+
+
+@website_settings.route('/newsletter-table')
+@website_settings.route('/newsletter-table/<int:page_id>')
+@admin_only
+def newsletter_subscribers_table(page_id=1):
+    view_filter = request.args.get('view_filter')
+    requested_subscribers = get_subscribers_by_filter(view_filter)
+    subscribers_dict = get_subscribers_dict(requested_subscribers)
+    return handle_page(endpoint='index.html', newsletter_table="True", items_lst=subscribers_dict, page_id=page_id,
+                       items_arg='subscribers', title='Newsletter Subscribers Database', current_view=view_filter,
+                       subtitle='Visualize your newsletter subscribers database effortlessly.')
 
 
 @website_settings.route('/delete-unconfirmed')

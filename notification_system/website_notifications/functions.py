@@ -13,10 +13,11 @@ def get_notifications_dict(user):
             notifications_dict = [
                 {"date": notification.date, "by_user": User.query.filter_by(email=notification.by_user).first(),
                  "user_name": notification.user_name,
+                 "user_email": notification.by_user,
                  "parent_comment": notification.parent_comment,
                  "parent_reply": notification.parent_reply,
                  "category": notification.category, "body": notification.body} for
                 notification in user_notifications]
             return notifications_dict
         except AttributeError:
-            return abort(500)
+            return abort(400)
