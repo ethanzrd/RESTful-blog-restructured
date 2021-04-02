@@ -104,8 +104,7 @@ def get_form_elements(configuration):
             form_arguments = {key: requested_configuration[key] for key in requested_configuration}
         except KeyError:
             form_arguments = {}
-        else:
-            return form_arguments
+        return form_arguments
 
 
 def update_configuration(configuration, form, new_email=False, flash_message=None):
