@@ -24,7 +24,7 @@ def log_changes(configuration, new_configuration, keys_lst, values_lst):
             current_key = ' '.join(keys_lst[index].split('_')).title()
         else:
             current_key = keys_lst[index].title()
-        current_change = values_lst[index] if values_lst[index] != '' else None
+        current_change = values_lst[index] if values_lst[index].strip() != '' else None
         if not track_changes:
             changes_lst.append(f"{current_key}: {current_change}")
         else:
