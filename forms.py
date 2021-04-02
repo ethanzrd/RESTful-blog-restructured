@@ -45,6 +45,15 @@ class WebConfigForm(FlaskForm):
                                  render_kw={"style": "margin-bottom: 10px;"})
     dev_link = StringField("Dev Link",
                            render_kw={"style": "margin-bottom: 10px;"})
+    whatsapp_link = StringField("WhatsApp Link",
+                                render_kw={"style": "margin-bottom: 10px;"})
+    reddit_link = StringField("Reddit Link",
+                              render_kw={"style": "margin-bottom: 10px;"})
+    pinterest_link = StringField("Pinterest Link",
+                                 render_kw={"style": "margin-bottom: 10px;"})
+    telegram_link = StringField("Telegram Link",
+                                render_kw={"style": "margin-bottom: 10px;"})
+
     submit = SubmitField("Save Changes", render_kw={"style": "margin-top: 20px;"})
 
 
