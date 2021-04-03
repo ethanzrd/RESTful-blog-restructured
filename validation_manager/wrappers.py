@@ -54,7 +54,6 @@ def validate_api_route(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         route_status = get_route_status(func.__name__)
-        print(route_status)
         if route_status == 'blocked':
             return jsonify(response={"Route Blocked": "The requested route is blocked."}), 503
         elif route_status == 'unavailable':

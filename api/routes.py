@@ -4,7 +4,7 @@ from werkzeug.utils import redirect
 
 from forms import ApiGenerate
 from validation_manager.wrappers import validate_api_route, admin_only, validate_api_key
-from models import ApiKey
+from models import ApiKey, User
 from extensions import db
 from post_system.post.functions import get_posts, get_post_dict
 import random
@@ -61,8 +61,7 @@ def all_posts():
     except AttributeError:
         return abort(500)
     posts = get_posts()
-    posts_dict = {posts.index(post) + 1: get_post_dict(post)
-                  for post in posts}
+    posts_dict = [get_post_dict(post) for post in posts]
     db.session.commit()
     return jsonify(response=posts_dict), 200
 
@@ -99,4 +98,23 @@ def all_users():
         return abort(500)
     users_dict = get_users_dict()
     db.session.commit()
-    return users_dict
+    return jsonify(response=users_dict), 200
+
+
+@api.route('/random-user')
+@validate_api_key
+@validate_api_route
+def random_user():
+    api_key = request.args.get('api_key')
+    try:
+        requesting_user = ApiKey.query.filter_by(api_key=api_key).first()
+        requesting_user.random_user += 1
+    except AttributeError:
+        return abort(500)
+    try:
+        selected_user = random.choice(User.query.all())
+        user_dict = get_users_dict(selected_user)
+    except IndexError:
+        user_dict = {}
+    db.session.commit()
+    return jsonify(response=user_dict)

@@ -9,6 +9,7 @@ from flask_login import current_user
 from extensions import db
 from sqlalchemy.exc import OperationalError
 from maintenance import clean_notifications
+from post_system.comment.functions import get_comment_dict, get_full_comment_dict
 
 
 def get_deleted_posts():
@@ -23,16 +24,18 @@ def get_posts():
 
 
 def get_post_dict(post):
-    post_dict = {"post": {"author": post.author.name,
-                          "title": post.title,
-                          "subtitle": post.subtitle,
-                          "published_on": post.date,
-                          "contents": html2text(post.body).strip(),
-                          "img_url": post.img_url,
-                          "comments": [(comment.author.name, html2text(comment.comment).strip()) for comment
-                                       in post.comments]
-                          }}
+    post_dict = {"author": post.author.name,
+                 "title": post.title,
+                 "subtitle": post.subtitle,
+                 "published_on": post.date,
+                 "contents": html2text(post.body).strip(),
+                 "img_url": post.img_url,
+                 "comments": get_post_comments(post)}
     return post_dict
+
+
+def get_post_comments(post):
+    return [get_comment_dict(comment) for comment in post.comments]
 
 
 def get_full_post_dict(requested_post):
@@ -50,14 +53,7 @@ def get_full_post_dict(requested_post):
             "img_url": requested_post.img_url,
             "body": requested_post.body,
             "date": requested_post.date,
-            "comments": [{"author_id": comment.author_id, "author": comment.author.name,
-                          "author_email": comment.author.email, "post_id": comment.post_id,
-                          "comment": comment.comment,
-                          "comment_id": comment.id,
-                          "date": comment.date, "replies": [
-                    {"author_id": reply.author_id, "author_email": reply.author.email, "author": reply.author.name,
-                     "comment_id": reply.comment_id, "reply": reply.reply, "date": reply.date}
-                    for reply in comment.replies]} for comment in post_comments]
+            "comments": [get_full_comment_dict(comment) for comment in post_comments]
         }
         return post_dict
 
@@ -101,8 +97,7 @@ def post_edition(requested_post, form, request='GET'):
         return redirect(url_for('post.show_post', post_id=post_id))
     else:
         return render_template('make-post.html', edit=True, post=requested_post, form=form,
-                               background_image=requested_post.img_url,
-                               navbar=requested_post.color if requested_post.color != '' else get_navbar())
+                               background_image=requested_post.img_url)
 
 
 def post_deletion(requested_post):

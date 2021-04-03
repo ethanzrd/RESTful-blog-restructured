@@ -38,7 +38,11 @@ def get_users_by_filter(view_filter=None):
 def get_users_dict(users=None):
     if not users:
         users = User.query.all()
-    users_dict = {users.index(user) + 1: {"username": user.name,
+    try:
+        users = list(users)
+    except TypeError:
+        users = [users]
+    users_dict = [{"username": user.name,
                                           "permissions":
                                               "Administrator" if user.admin is True else "Author"
                                               if user.author is True
@@ -46,19 +50,27 @@ def get_users_dict(users=None):
                                               else None,
                                           "is_developer": True if
                                           ApiKey.query.filter_by(developer_id=user.id) else False,
-                                          "posts": {user.posts.index(post) + 1: get_post_dict(post) for post
+                                          "posts": [get_post_dict(post) for post
                                                     in
-                                                    user.posts},
-                                          "comments": {
-                                              user.comments.index(comment) + 1: {"comment": comment.comment,
-                                                                                 "on_post":
-                                                                                     comment.parent_post
-                                                                                         .title,
-                                                                                 "post_author":
-                                                                                     comment.parent_post
-                                                                                         .author.name}
-                                              for comment in user.comments}}
-                  for user in users if user.confirmed_email is True}
+                                                    user.posts],
+                                          "comments": [{
+                                              "comment": html2text(comment.comment).strip(),
+                                              "on_post":
+                                                  comment.parent_post
+                                                      .title,
+                                              "post_author":
+                                                  comment.parent_post
+                                                      .author.name,
+                                              "commented_on": comment.date}
+                                              for comment in user.comments],
+                                          "replies": [{"reply": reply.reply.strip(),
+                                                       "on_comment": html2text(reply.parent_comment.comment).strip(),
+                                                       "on_post": reply.parent_comment.parent_post.title,
+                                                       "replied_on": reply.date,
+                                                       "comment_author": reply.parent_comment.author.name,
+                                                       "post_author": reply.parent_comment.parent_post.author.name} for
+                                                      reply in user.replies]}
+                  for user in users if user.confirmed_email is True]
     return users_dict
 
 
@@ -114,7 +126,7 @@ def remove_user_as_author(user, reason):
 
 
 def user_page_redirect(user_id, current_mode, page_id=1):
-    given_mode = current_mode if current_mode != 'delete-report' else 'deletion_report'\
+    given_mode = current_mode if current_mode != 'delete-report' else 'deletion_report' \
         if current_mode in ['posts', 'comments', 'api', 'delete-report'] else 'posts'
     requested_mode = f"user_operations.user_{given_mode}"
     return redirect(url_for(requested_mode, user_id=user_id, page_id=page_id))
