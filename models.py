@@ -66,6 +66,7 @@ class ApiKey(db.Model):
     all_posts = db.Column(db.Integer, default=0)
     random_post = db.Column(db.Integer, default=0)
     all_users = db.Column(db.Integer, default=0)
+    random_user = db.Column(db.Integer, default=0)
 
 
 class BlogPost(db.Model):

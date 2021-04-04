@@ -29,9 +29,13 @@ def get_data(homepage=False):  # GET CONFIG DATA
                             "telegram_link": "https://www.telegram.com"
                         },
                         "api_configuration": {
-                            "all_posts": True,
-                            "all_users": True,
-                            "random_post": True
+                            "all_posts": False,
+                            "all_users": False,
+                            "random_post": False,
+                            "random_user": False,
+                            "add_post": False,
+                            "edit_post": False,
+                            "delete_post": False
                         },
                         "newsletter_configuration": {
                             'subscription_title': 'Subscribe to our newsletter!',

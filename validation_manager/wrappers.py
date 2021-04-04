@@ -2,7 +2,9 @@ from functools import wraps
 from flask_login import current_user
 from flask import abort, jsonify, request, flash, url_for
 from werkzeug.utils import redirect
-
+from settings import SECRET_KEY
+from models import User
+import jwt
 from api.functions import is_key_blocked
 from models import ApiKey
 from validation_manager.functions import get_route_status
@@ -54,7 +56,6 @@ def validate_api_route(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         route_status = get_route_status(func.__name__)
-        print(route_status)
         if route_status == 'blocked':
             return jsonify(response={"Route Blocked": "The requested route is blocked."}), 503
         elif route_status == 'unavailable':
@@ -112,4 +113,23 @@ def newsletter_staff(func):
         else:
             return abort(403)
 
+    return wrapper
+
+
+def token_required(func):
+    """Checks whether the given token is valid or raises the appropriate error."""
+
+    def wrapper(*args, **kwargs):
+        token = request.headers.get('x-access-token')
+        if not token:
+            return jsonify(response="Missing token."), 401
+        data = jwt.decode(token, SECRET_KEY, algorithms="HS256")
+        requested_user = User.query.get(data['user']['user_id'])
+
+        if requested_user:
+            return func(requested_user, *args, **kwargs)
+        else:
+            return jsonify(response="Could not find the requested user."), 404
+
+    wrapper.__name__ = func.__name__
     return wrapper

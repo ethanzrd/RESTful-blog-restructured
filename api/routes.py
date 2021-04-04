@@ -1,15 +1,16 @@
 from flask import Blueprint, request, abort, jsonify, url_for, render_template, flash
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
-
 from forms import ApiGenerate
-from validation_manager.wrappers import validate_api_route, admin_only, validate_api_key
-from models import ApiKey
+from post_system.post.api_validations import validate_post_addition
+from validation_manager.wrappers import validate_api_route, admin_only, validate_api_key, token_required
+from models import ApiKey, User
 from extensions import db
 from post_system.post.functions import get_posts, get_post_dict
 import random
 from users_manager.functions import get_users_dict
-from api.functions import add_key, block_api_key, unblock_api_key
+from api.functions import add_key, block_api_key, unblock_api_key, handle_post_edition, handle_token_generation, \
+    handle_post_deletion
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -53,7 +54,8 @@ def unblock_key(key_id):
 @api.route('/all-posts')
 @validate_api_key
 @validate_api_route
-def all_posts():
+def all_posts(requesting_user):
+    print(requesting_user)
     api_key = request.args.get('api_key')
     try:
         requesting_user = ApiKey.query.filter_by(api_key=api_key).first()
@@ -61,8 +63,7 @@ def all_posts():
     except AttributeError:
         return abort(500)
     posts = get_posts()
-    posts_dict = {posts.index(post) + 1: get_post_dict(post)
-                  for post in posts}
+    posts_dict = [get_post_dict(post) for post in posts]
     db.session.commit()
     return jsonify(response=posts_dict), 200
 
@@ -99,4 +100,54 @@ def all_users():
         return abort(500)
     users_dict = get_users_dict()
     db.session.commit()
-    return users_dict
+    return jsonify(response=users_dict), 200
+
+
+@api.route('/random-user')
+@validate_api_key
+@validate_api_route
+def random_user():
+    api_key = request.args.get('api_key')
+    try:
+        requesting_user = ApiKey.query.filter_by(api_key=api_key).first()
+        requesting_user.random_user += 1
+    except AttributeError:
+        return abort(500)
+    try:
+        selected_user = random.choice(User.query.all())
+        user_dict = get_users_dict(selected_user)
+    except IndexError:
+        user_dict = {}
+    db.session.commit()
+    return jsonify(response=user_dict)
+
+
+@api.route('/generate-token')
+def generate_token():
+    auth = request.authorization
+    return handle_token_generation(auth=auth)
+
+
+@api.route('/add-post')
+@validate_api_route
+@token_required
+def add_post(requesting_user):
+    if requesting_user.admin or requesting_user.author:
+        new_post_json = request.get_json()
+        return validate_post_addition(post_json=new_post_json, requesting_user=requesting_user)
+    else:
+        return jsonify(response="You're unauthorized to access this route."), 403
+
+
+@api.route('/edit-post/<int:post_id>')
+@validate_api_route
+@token_required
+def edit_post(requesting_user, post_id):
+    return handle_post_edition(requesting_user=requesting_user, post_id=post_id, changes_json=request.get_json())
+
+
+@api.route('/delete-post/<int:post_id>')
+@validate_api_route
+@token_required
+def delete_post(requesting_user, post_id):
+    return handle_post_deletion(requesting_user=requesting_user, post_id=post_id)

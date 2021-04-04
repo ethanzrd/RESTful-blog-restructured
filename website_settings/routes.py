@@ -39,15 +39,12 @@ def web_configuration():
 @website_settings.route('/contact-configure', methods=['GET', 'POST'])
 @admin_only
 def contact_configuration():
-    data = get_data()
     form = ContactConfigForm(**get_form_elements('contact_configuration'))
     message = None
     if form.validate_on_submit():
         new_email = False
-        try:
-            support_email = data["contact_configuration"]["support_email"]
-        except KeyError:
-            support_email = ''
+        data = get_data()
+        support_email = data.get("contact_configuration", {}).get("support_email", '')
         if form.support_email.data != support_email:
             message = generate_support_email_verification(form.support_email.data)
             new_email = True
