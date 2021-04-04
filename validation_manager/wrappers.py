@@ -123,13 +123,16 @@ def token_required(func):
         token = request.headers.get('x-access-token')
         if not token:
             return jsonify(response="Missing token."), 401
-        data = jwt.decode(token, SECRET_KEY, algorithms="HS256")
-        requested_user = User.query.get(data['user']['user_id'])
+        try:
+            data = jwt.decode(token, SECRET_KEY, algorithms="HS256")
+            requested_user = User.query.get(data['user']['user_id'])
 
-        if requested_user:
-            return func(requested_user, *args, **kwargs)
-        else:
-            return jsonify(response="Could not find the requested user."), 404
+            if requested_user:
+                return func(requested_user, *args, **kwargs)
+            else:
+                return jsonify(response="Could not find the requested user."), 404
+        except:
+            return jsonify(response="Invalid token.")
 
     wrapper.__name__ = func.__name__
     return wrapper
