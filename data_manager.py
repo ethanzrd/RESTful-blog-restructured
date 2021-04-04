@@ -32,7 +32,10 @@ def get_data(homepage=False):  # GET CONFIG DATA
                             "all_posts": False,
                             "all_users": False,
                             "random_post": False,
-                            "random_user": False
+                            "random_user": False,
+                            "add_post": False,
+                            "edit_post": False,
+                            "delete_post": False
                         },
                         "newsletter_configuration": {
                             'subscription_title': 'Subscribe to our newsletter!',

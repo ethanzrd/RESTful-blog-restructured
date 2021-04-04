@@ -148,6 +148,9 @@ class ApiConfig(FlaskForm):
     all_users = BooleanField("Users Route")
     random_post = BooleanField("Random Post Route")
     random_user = BooleanField("Random Users Route")
+    add_post = BooleanField("Add Post Route")
+    edit_post = BooleanField("Edit Post Route")
+    delete_post = BooleanField("Delete Post Route")
     submit = SubmitField("Save Changes", render_kw={"style": "margin-top: 20px;"})
 
 
