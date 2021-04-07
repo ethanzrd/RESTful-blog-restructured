@@ -61,3 +61,14 @@ def reply_edition(requested_reply, form, current_page=1, request='GET'):
             return abort(403)
     else:
         return abort(401)
+
+
+def get_comment_replies(comment):
+    return [{"reply_author": reply.author.name, "reply": reply.reply.strip(),
+             "replied_on": reply.date} for reply in comment.replies]
+
+
+def get_full_comment_replies(comment):
+    return [{"author_id": reply.author_id, "author_email": reply.author.email, "author": reply.author.name,
+             "comment_id": reply.comment_id, "reply": reply.reply, "date": reply.date}
+            for reply in comment.replies]

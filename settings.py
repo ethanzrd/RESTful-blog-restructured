@@ -12,7 +12,9 @@ CONFIG_KEYS = {'about_configuration': ['page_heading', 'page_subheading', 'page_
                                          'pinterest_link', 'telegram_link'],
                'contact_configuration': ['page_heading', 'page_subheading', 'page_description', 'background_image',
                                          'support_email'],
-               'api_configuration': ['all_posts', 'all_users', 'random_post'],
+               'api_configuration': ['all_posts', 'all_users', 'random_post', 'random_user', 'get_post', 'add_post',
+                                     'edit_post', 'delete_post', 'newsletter_sendout'],
                'newsletter_configuration': ['subscription_title', 'subscription_subtitle',
                                             'unsubscription_title', 'unsubscription_subtitle',
                                             'authors_allowed', 'enabled']}
+API_METHODS = {'get': 'get_post', 'put': 'add_post', 'patch': 'edit_post', 'delete': 'delete_post'}

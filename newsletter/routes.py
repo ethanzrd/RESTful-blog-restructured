@@ -6,8 +6,7 @@ from validation_manager.wrappers import staff_only, newsletter_route, newsletter
 
 newsletter = Blueprint('newsletter', __name__, url_prefix='/newsletter')
 
-#sahar
-# test
+
 @newsletter.route('/subscribe', methods=['GET', 'POST'])
 @newsletter_route
 def subscribe():

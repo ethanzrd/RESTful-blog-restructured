@@ -1,9 +1,12 @@
 from flask_login import current_user
+from html2text import html2text
+
 from extensions import db
 from models import Notification, Comment, DeletedPost, Reply
 from flask import redirect, url_for, flash, abort, render_template
 from utils import generate_date
 from maintenance import clean_notifications
+from post_system.reply.functions import get_comment_replies, get_full_comment_replies
 
 
 def get_comment(comment_id):
@@ -98,3 +101,16 @@ def comment_deletion(requested_comment):
             return abort(403)
     else:
         return abort(401)
+
+
+def get_comment_dict(comment):
+    return {"comment_author": comment.author.name, "comment": html2text(comment.comment).strip(),
+            "commented_on": comment.date,
+            "replies": get_comment_replies(comment)}
+
+
+def get_full_comment_dict(comment):
+    return {"author_id": comment.author_id, "author": comment.author.name,
+            "author_email": comment.author.email, "post_id": comment.post_id,
+            "comment": comment.comment, "comment_id": comment.id,
+            "date": comment.date, "replies": get_full_comment_replies(comment)}

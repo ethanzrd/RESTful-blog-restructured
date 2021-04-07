@@ -1,3 +1,4 @@
+from flask import jsonify
 from flask_login import current_user
 from models import Log
 from extensions import db
@@ -24,7 +25,7 @@ def log_changes(configuration, new_configuration, keys_lst, values_lst):
             current_key = ' '.join(keys_lst[index].split('_')).title()
         else:
             current_key = keys_lst[index].title()
-        current_change = values_lst[index] if values_lst[index].strip() != '' else None
+        current_change = values_lst[index] if str(values_lst[index]).strip() != '' else None
         if not track_changes:
             changes_lst.append(f"{current_key}: {current_change}")
         else:
@@ -43,3 +44,63 @@ def log_changes(configuration, new_configuration, keys_lst, values_lst):
                                   f"Changes:<br><br>{changes}", date=generate_date(), user_email=current_user.email)
         db.session.add(new_log)
         db.session.commit()
+
+
+def log_api_post_addition(post, requesting_user):
+    new_log = Log(user=requesting_user, user_name=requesting_user.name, category='api_request',
+                  description=f"{requesting_user.name} published a post via an API request.<br><br>"
+                              f'Post ID: {post.id}',
+                  date=generate_date(), user_email=requesting_user.email)
+    db.session.add(new_log)
+    db.session.commit()
+
+
+def log_api_post_edition(requested_post, changes_json, requesting_user):
+    changes = []
+    for key in changes_json:
+        if getattr(requested_post, key) != changes_json[key] and any(str(changes_json[key]).strip()):
+            new_change = f"{key.title() if key != 'img_url' else 'Image URL'}:" \
+                         f" {requested_post[key]} -> {changes_json[key]}"
+            changes.append(new_change)
+    changes_description = '<br><br>'.join(changes)
+    if any(changes):
+        new_log = Log(user=requesting_user, user_name=requesting_user.name, category='api_request',
+                      description=f"{requesting_user.name} edited a post via an API request.<br>"
+                                  f'Post ID: {requested_post.id}<br><br>'
+                                  f'Changes:<br><br>{changes_description}', user_email=requesting_user.emai,
+                      date=generate_date())
+        db.session.add(new_log)
+        db.session.commit()
+
+
+def log_api_post_deletion(requested_post, requesting_user):
+    post_information = [f"Author - {requested_post.author.name}",
+                        f"Title - {requested_post.title}",
+                        f"Subtitle - {requested_post.subtitle}"]
+    log_information = '<br><br>'.join(post_information)
+    new_log = Log(user=requesting_user, user_name=requesting_user.name, category='api_request',
+                  description=f"{requesting_user.name} deleted a post via an API request.<br><br>"
+                              f"Post Details:<br><br>{log_information}", user_email=requesting_user.email,
+                  date=generate_date())
+    db.session.add(new_log)
+    db.session.commit()
+
+
+def log_newsletter_sendout(title, contents):
+    new_log = Log(user=current_user,
+                  description=f"{current_user.name} sent out a newsletter.<br><br>"
+                              f"Title: {title}<br><br>Contents: {contents}",
+                  user_name=current_user.name, date=generate_date(), category='newsletter',
+                  user_email=current_user.email)
+    db.session.add(new_log)
+    db.session.commit()
+
+
+def log_api_newsletter_sendout(requesting_user, title, contents):
+    new_log = Log(user=requesting_user,
+                  description=f"{requesting_user.name} sent out a newsletter via an API request.<br><br>"
+                              f"Title: {title}<br><br>Contents: {contents}",
+                  user_name=requesting_user.name, date=generate_date(), category='api_request',
+                  user_email=requesting_user.email)
+    db.session.add(new_log)
+    db.session.commit()

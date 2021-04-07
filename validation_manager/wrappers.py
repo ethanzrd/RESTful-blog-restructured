@@ -1,13 +1,16 @@
 from functools import wraps
 from flask_login import current_user
-from flask import abort, jsonify, request, flash, url_for
+from flask import abort, jsonify, request, flash, url_for, make_response
 from werkzeug.utils import redirect
-
+from settings import SECRET_KEY
+from models import User
+import jwt
 from api.functions import is_key_blocked
 from models import ApiKey
 from validation_manager.functions import get_route_status
 from context_manager import newsletter_functionality
 from newsletter.functions import authors_allowed
+from settings import API_METHODS
 
 
 def logout_required(func):
@@ -48,22 +51,30 @@ def staff_only(func):
     return wrapper
 
 
-def validate_api_route(func):
-    """Checks whether a route is available or raises the appropriate error."""
+def api_validation_factory(newsletter=False, *args, **kwargs):
+    def validate_api_route(func):
+        """Checks whether a route is available or raises the appropriate error."""
 
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        route_status = get_route_status(func.__name__)
-        print(route_status)
-        if route_status == 'blocked':
-            return jsonify(response={"Route Blocked": "The requested route is blocked."}), 503
-        elif route_status == 'unavailable':
-            return jsonify(response={"Route Configuration Unavailable": "The requested route configuration"
-                                                                        " is unavailable."}), 500
-        else:
-            return func(*args, **kwargs)
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            func_name = func.__name__
+            if func_name in API_METHODS.keys() and not newsletter:
+                func_name = API_METHODS[func_name]
+            elif newsletter:
+                func_name = 'newsletter_sendout'
+            route_status = get_route_status(func_name)
+            if route_status == 'blocked':
+                return make_response(jsonify(response={"Route Blocked": "The requested route is blocked."}), 503)
+            elif route_status == 'unavailable':
+                return make_response(
+                    jsonify(response={"Route Configuration Unavailable": "The requested route configuration"
+                                                                         " is unavailable."}), 503)
+            else:
+                return func(*args, **kwargs)
 
-    return wrapper
+        return wrapper
+
+    return validate_api_route
 
 
 def validate_api_key(func):
@@ -112,4 +123,23 @@ def newsletter_staff(func):
         else:
             return abort(403)
 
+    return wrapper
+
+
+def token_required(func):
+    """Checks whether the given token is valid or raises the appropriate error."""
+
+    def wrapper(*args, **kwargs):
+        token = request.headers.get('x-access-token')
+        if not token:
+            return make_response(jsonify(response="Missing token."), 401)
+        data = jwt.decode(token, SECRET_KEY, algorithms="HS256")
+        requesting_user = User.query.get(data['user']['user_id'])
+
+        if requesting_user:
+            return func(*args, **kwargs, requesting_user=requesting_user)
+        else:
+            return make_response(jsonify(response="Could not find the requested user."), 404)
+
+    wrapper.__name__ = func.__name__
     return wrapper

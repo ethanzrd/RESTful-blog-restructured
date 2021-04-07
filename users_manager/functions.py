@@ -11,7 +11,6 @@ from notification_system.email_notifications.notifications import set_notificati
     account_deleted_notification, deletion_request_notification
 from post_system.post.functions import get_post_dict
 from utils import generate_date, handle_page, get_admin_count
-from validation_manager.wrappers import admin_only
 from html2text import html2text
 
 from verification_manager.generate_verification import generate_deletion
@@ -38,27 +37,35 @@ def get_users_by_filter(view_filter=None):
 def get_users_dict(users=None):
     if not users:
         users = User.query.all()
-    users_dict = {users.index(user) + 1: {"username": user.name,
-                                          "permissions":
-                                              "Administrator" if user.admin is True else "Author"
-                                              if user.author is True
-                                              else "Registered User" if user.confirmed_email is True
-                                              else None,
-                                          "is_developer": True if
-                                          ApiKey.query.filter_by(developer_id=user.id) else False,
-                                          "posts": {user.posts.index(post) + 1: get_post_dict(post) for post
-                                                    in
-                                                    user.posts},
-                                          "comments": {
-                                              user.comments.index(comment) + 1: {"comment": comment.comment,
-                                                                                 "on_post":
-                                                                                     comment.parent_post
-                                                                                         .title,
-                                                                                 "post_author":
-                                                                                     comment.parent_post
-                                                                                         .author.name}
-                                              for comment in user.comments}}
-                  for user in users if user.confirmed_email is True}
+    try:
+        users = list(users)
+    except TypeError:
+        users = [users]
+    users_dict = [{"username": user.name,
+                   "permissions": get_user_permissions(user),
+                   "is_developer": True if
+                   ApiKey.query.filter_by(developer_id=user.id) else False,
+                   "posts": [get_post_dict(post) for post
+                             in
+                             user.posts],
+                   "comments": [{
+                       "comment": html2text(comment.comment).strip(),
+                       "on_post":
+                           comment.parent_post
+                               .title,
+                       "post_author":
+                           comment.parent_post
+                               .author.name,
+                       "commented_on": comment.date}
+                       for comment in user.comments],
+                   "replies": [{"reply": reply.reply.strip(),
+                                "on_comment": html2text(reply.parent_comment.comment).strip(),
+                                "on_post": reply.parent_comment.parent_post.title,
+                                "replied_on": reply.date,
+                                "comment_author": reply.parent_comment.author.name,
+                                "post_author": reply.parent_comment.parent_post.author.name} for
+                               reply in user.replies]}
+                  for user in users if user.confirmed_email is True]
     return users_dict
 
 
@@ -66,7 +73,22 @@ def if_unconfirmed_users():
     return any(User.query.filter_by(confirmed_email=False).all())
 
 
-@admin_only
+def get_user_information(user):
+    try:
+        user_dict = {"user_id": user.id,
+                     "username": user.name,
+                     "permissions": get_user_permissions(user),
+                     "is_developer": True if ApiKey.query.filter_by(developer_id=user.id) else False}
+        return user_dict
+    except AttributeError:
+        return abort(400)
+
+
+def get_user_permissions(user):
+    return "Administrator" if user.admin is True else "Author" if user.author is True \
+        else "Registered User" if user.confirmed_email is True else None
+
+
 def delete_unconfirmed_users():
     if current_user.is_authenticated and current_user.admin:
         unconfirmed = User.query.filter_by(confirmed_email=False).all()
@@ -81,7 +103,6 @@ def delete_unconfirmed_users():
         abort(403)
 
 
-@admin_only
 def make_user_author(user, reason):
     try:
         user.author = True
@@ -97,7 +118,6 @@ def make_user_author(user, reason):
     return redirect(url_for('user_operations.user_page', user_id=user.id))
 
 
-@admin_only
 def remove_user_as_author(user, reason):
     try:
         user.author = False
@@ -114,7 +134,7 @@ def remove_user_as_author(user, reason):
 
 
 def user_page_redirect(user_id, current_mode, page_id=1):
-    given_mode = current_mode if current_mode != 'delete-report' else 'deletion_report'\
+    given_mode = current_mode if current_mode != 'delete-report' else 'deletion_report' \
         if current_mode in ['posts', 'comments', 'api', 'delete-report'] else 'posts'
     requested_mode = f"user_operations.user_{given_mode}"
     return redirect(url_for(requested_mode, user_id=user_id, page_id=page_id))
@@ -179,7 +199,6 @@ def handle_account_deletion(user, title, reason):
     return redirect(url_for('home.home_page', category='success'))
 
 
-@login_required
 def handle_deletion_request(reason, explanation):
     if get_admin_count() < 1:
         requested_user = User.query.get(current_user.id)
@@ -199,7 +218,6 @@ def handle_deletion_request(reason, explanation):
         return generate_deletion()
 
 
-@login_required
 def handle_account_settings():
     options = get_options()
     title = "Account Settings"

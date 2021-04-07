@@ -67,19 +67,20 @@ def get_user_api(user_id):
         return
     if requested_api is not None:
         api_dict = {1: {"key_id": requested_api.id,
-                        "name": "API Status",
+                        "name": "API Key Status",
                         "description": "Online" if requested_api.blocked is False else "Blocked",
                         "Developer's Occupation": requested_api.occupation,
                         "Application": requested_api.application,
                         "API Usage": requested_api.usage,
                         "API Key": requested_api.api_key},
                     2: {"name": "API Requests",
-                        "description": "Request statistics",
+                        "description": "Request Statistics",
                         "Total Requests": sum([requested_api.all_posts, requested_api.random_post,
-                                               requested_api.all_users]),
+                                               requested_api.all_users, requested_api.random_user]),
                         "All Posts Requests": requested_api.all_posts,
                         "Random Post Requests": requested_api.random_post,
-                        "All Users Requests": requested_api.all_users}}
+                        "All Users Requests": requested_api.all_users,
+                        "Random User Requests": requested_api.random_user}}
         return api_dict
     return
 

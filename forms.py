@@ -74,7 +74,7 @@ class ContactForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     message = CKEditorField("Your Message", validators=[DataRequired()])
-    submit = SubmitField("Send Message", render_kw={"style": "margin-top: 20px;"})
+    submit = SubmitField("Send Message", render_kw={"style": "margin-top: 20px; margin-bottom: 20px;"})
 
 
 class CommentForm(FlaskForm):
@@ -147,6 +147,12 @@ class ApiConfig(FlaskForm):
     all_posts = BooleanField("All Posts Route")
     all_users = BooleanField("Users Route")
     random_post = BooleanField("Random Post Route")
+    random_user = BooleanField("Random Users Route")
+    get_post = BooleanField("Get Post Route")
+    add_post = BooleanField("Add Post Route")
+    edit_post = BooleanField("Edit Post Route")
+    delete_post = BooleanField("Delete Post Route")
+    newsletter_sendout = BooleanField("Newsletter Sendout Route")
     submit = SubmitField("Save Changes", render_kw={"style": "margin-top: 20px;"})
 
 

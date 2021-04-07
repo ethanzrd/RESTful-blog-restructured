@@ -27,3 +27,6 @@ flask_msearch==0.2.9.1
 flask_mail==0.9.1
 sqlalchemy_json==0.4.0
 flask_restful==0.3.8
+flask_swagger==0.2.14
+uuid==1.30
+pyjwt==2.0.1
