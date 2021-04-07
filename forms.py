@@ -181,7 +181,7 @@ class NewsletterSubscriptionForm(FlaskForm):
     submit = SubmitField("Subscribe to the newsletter", render_kw={"style": "margin-top: 20px;"})
 
 
-class NewsletterUnsubscribeForm(FlaskForm):
+class   NewsletterUnsubscribeForm(FlaskForm):
     email = StringField("Email Address", validators=[DataRequired(), Email()])
     reason = SelectField("Why are you unsubscribing from the newsletter?", choices=[('Dissatisfied', 'Dissatisfied'),
                                                                                     (

@@ -324,7 +324,7 @@
                                 </p>
                                 {% if subscriber.active != True %}
                                 <p>
-                                    Unsubscription Reason: {{subscriber['unsubscription_date']}}
+                                    Unsubscription Reason: {{subscriber['unsubscription_reason']}}
                                 </p>
                                 <p>
                                     Additional Unsubscription Info: {{subscriber['unsubscription_explanation']}}
@@ -375,7 +375,8 @@
                                         <li><a href="{{ url_for('post.deleted_posts') }}"><h4>Recover Deleted Posts</h4>
                                         </a>
                                         </li>
-                                        {% if newsletter_enabled and current_user.author and authors_allowed or newsletter_enabled and current_user.admin %}
+                                        {% if newsletter_enabled and current_user.author and authors_allowed or
+                                        newsletter_enabled and current_user.admin %}
                                         <li><a href="{{ url_for('newsletter.send_newsletter') }}"><h4>Send
                                             Newsletter</h4></a></li>
                                         {% endif %}
@@ -499,7 +500,7 @@
                                         {% if posts_count >= 3 %}
                                         {% set hr_valid = True %}
                                         {% if deleted != "True" and user_table != "True" and settings != "True" and logs
-                                        != 'True' and newsletter_table != 'True' %}
+                                        != 'True' and newsletter_table != 'True' and search != True %}
                                         <a class="btn btn-primary float-right"
                                            href="{{ url_for('home.home_page', page_id=current_id + 1) }}">NEXT
                                             PAGE
@@ -529,6 +530,12 @@
                                             PAGE
                                             &rarr;</a>
                                         {% endif %}
+                                        {% if search == True %}
+                                        <a class="btn btn-primary float-right"
+                                           href="{{ url_for('search.search', query=query, category=category, page_id=current_id + 1) }}">NEXT
+                                            PAGE
+                                            &rarr;</a>
+                                        {% endif %}
                                         {% if settings == 'True' and current_id < 3 %}
                                         {% if mode != 'admin' %}
                                         <a class="btn btn-primary float-right"
@@ -548,7 +555,7 @@
                                         {% if current_id > 1 %}
                                         {% set hr_valid = True %}
                                         {% if deleted != "True" and user_table != "True" and settings != "True" and logs
-                                        != "True" and newsletter_table != 'True' %}
+                                        != "True" and newsletter_table != 'True' and search != True %}
                                         <a class="btn btn-primary float-left"
                                            href="{{ url_for('home.home_page', page_id=current_id - 1) }}">&larr;
                                             PREVIOUS PAGE</a>
@@ -571,6 +578,11 @@
                                         {% if newsletter_table == 'True' %}
                                         <a class="btn btn-primary float-left"
                                            href="{{ url_for('website_settings.newsletter_subscribers_table', page_id=current_id - 1, view_filter=current_view) }}">&larr;
+                                            PREVIOUS PAGE</a>
+                                        {% endif %}
+                                        {% if search == True %}
+                                        <a class="btn btn-primary float-left"
+                                           href="{{ url_for('search.search', page_id=current_id - 1, category=category, query=query) }}">&larr;
                                             PREVIOUS PAGE</a>
                                         {% endif %}
                                         {% if settings == "True" %}
