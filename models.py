@@ -36,6 +36,10 @@ class DeletionReport(db.Model):
     rejection_link = db.Column(db.String(1000), default='')
     date = db.Column(db.String(250), default='')
 
+    __mapper_args__ = {
+        "order_by": id.desc()
+    }
+
 
 class Notification(db.Model):
     __tablename__ = 'notifications'
@@ -52,6 +56,10 @@ class Notification(db.Model):
     body = db.Column(db.String(1200), default='')
     date = db.Column(db.String(250), default='')
 
+    __mapper_args__ = {
+        "order_by": id.desc()
+    }
+
 
 class ApiKey(db.Model):
     __tablename__ = 'api_keys'
@@ -67,6 +75,10 @@ class ApiKey(db.Model):
     random_post = db.Column(db.Integer, default=0)
     all_users = db.Column(db.Integer, default=0)
 
+    __mapper_args__ = {
+        "order_by": id.desc()
+    }
+
 
 class BlogPost(db.Model):
     __tablename__ = 'blog_posts'
@@ -81,6 +93,10 @@ class BlogPost(db.Model):
     img_url = db.Column(db.String(600), nullable=True)
     comments = relationship("Comment", back_populates="parent_post")
 
+    __mapper_args__ = {
+        "order_by": id.desc()
+    }
+
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -94,6 +110,10 @@ class Comment(db.Model):
     comment = db.Column(db.Text, nullable=False)
     date = db.Column(db.String(250), nullable=False)
 
+    __mapper_args__ = {
+        "order_by": id.desc()
+    }
+
 
 class Reply(db.Model):
     __tablename__ = 'replies'
@@ -106,11 +126,19 @@ class Reply(db.Model):
     reply = db.Column(db.Text, nullable=False)
     date = db.Column(db.String(250), nullable=False)
 
+    __mapper_args__ = {
+        "order_by": id.desc()
+    }
+
 
 class DeletedPost(db.Model):
     __tablename__ = 'deleted_posts'
     id = db.Column(db.Integer, primary_key=True)
     json_column = db.Column(mutable_json_type(dbtype=JSON, nested=True), nullable=False)
+
+    __mapper_args__ = {
+        "order_by": id.desc()
+    }
 
 
 class Data(db.Model):
@@ -131,6 +159,10 @@ class NewsletterSubscription(db.Model):
     unsubscription_date = db.Column(db.String(300), default='')
     date = db.Column(db.String(300), nullable=False)
 
+    __mapper_args__ = {
+        "order_by": id.desc()
+    }
+
 
 class Log(db.Model):
     __tablename__ = 'logs'
@@ -142,3 +174,7 @@ class Log(db.Model):
     user_name = db.Column(db.String(700), nullable=False)
     user_email = db.Column(db.String(700), nullable=False)
     date = db.Column(db.String(700), nullable=False)
+
+    __mapper_args__ = {
+        "order_by": id.desc()
+    }
