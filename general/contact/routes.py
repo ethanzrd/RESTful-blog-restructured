@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 from flask_login import current_user
 
-from contact.functions import get_page_elements, is_page_valid, send_message
+from general.contact.functions import get_page_elements, is_page_valid, send_message
 from context_manager import get_background
 from forms import ContactForm
 

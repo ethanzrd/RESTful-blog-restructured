@@ -6,16 +6,16 @@ from post_system.post.routes import post
 from post_system.comment.routes import comment
 from post_system.reply.routes import reply
 from search.routes import search_routing
-from about.routes import about_routing
+from general.about.routes import about_routing
 from verification_manager.routes import verification
 from users_manager.routes import user_operations
 from api.routes import api
-from contact.routes import contact_routing
+from general.contact.routes import contact_routing
 from notification_system.website_notifications.routes import notification_routing
 from website_settings.routes import website_settings
 from login_system.routes import login_system
 from newsletter.routes import newsletter
-from home import home
+from general.home import home
 
 
 def create_app(config_file='app_config.py'):
@@ -67,7 +67,7 @@ def create_app(config_file='app_config.py'):
 
 app = create_app()
 app.app_context().push()
-from models import BlogPost, ApiKey, DeletionReport, Comment, DeletedPost, User, Reply, Notification, Data
+from models import User
 
 db.create_all()
 

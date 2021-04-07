@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from about.functions import get_page_elements
+from general.about.functions import get_page_elements
 
 about_routing = Blueprint('about', __name__, url_prefix='/about')
 
