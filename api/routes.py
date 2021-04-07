@@ -1,16 +1,18 @@
-from flask import Blueprint, request, abort, jsonify, url_for, render_template, flash
+from flask import Blueprint, request, abort, jsonify, url_for, render_template, flash, make_response
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
 from forms import ApiGenerate
 from post_system.post.api_validations import validate_post_addition
-from validation_manager.wrappers import validate_api_route, admin_only, validate_api_key, token_required
-from models import ApiKey, User
+from validation_manager.wrappers import api_validation_factory, admin_only, validate_api_key, token_required
+from models import ApiKey, User, BlogPost
 from extensions import db
 from post_system.post.functions import get_posts, get_post_dict
 import random
 from users_manager.functions import get_users_dict
 from api.functions import add_key, block_api_key, unblock_api_key, handle_post_edition, handle_token_generation, \
-    handle_post_deletion
+    handle_post_deletion, handle_newsletter_sendout
+from flask_restful import Resource
+from extensions import flask_api
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -53,9 +55,8 @@ def unblock_key(key_id):
 
 @api.route('/all-posts')
 @validate_api_key
-@validate_api_route
-def all_posts(requesting_user):
-    print(requesting_user)
+@api_validation_factory()
+def all_posts():
     api_key = request.args.get('api_key')
     try:
         requesting_user = ApiKey.query.filter_by(api_key=api_key).first()
@@ -70,7 +71,7 @@ def all_posts(requesting_user):
 
 @api.route('/random-post')
 @validate_api_key
-@validate_api_route
+@api_validation_factory()
 def random_post():
     api_key = request.args.get('api_key')
     try:
@@ -90,7 +91,7 @@ def random_post():
 
 @api.route('/users')
 @validate_api_key
-@validate_api_route
+@api_validation_factory()
 def all_users():
     api_key = request.args.get('api_key')
     try:
@@ -105,7 +106,7 @@ def all_users():
 
 @api.route('/random-user')
 @validate_api_key
-@validate_api_route
+@api_validation_factory()
 def random_user():
     api_key = request.args.get('api_key')
     try:
@@ -128,26 +129,43 @@ def generate_token():
     return handle_token_generation(auth=auth)
 
 
-@api.route('/add-post')
-@validate_api_route
-@token_required
-def add_post(requesting_user):
-    if requesting_user.admin or requesting_user.author:
-        new_post_json = request.get_json()
-        return validate_post_addition(post_json=new_post_json, requesting_user=requesting_user)
-    else:
-        return jsonify(response="You're unauthorized to access this route."), 403
+class Post(Resource):
+
+    @api_validation_factory()
+    def get(self, post_id):
+        requested_post = BlogPost.query.get(post_id)
+        if requested_post:
+            return make_response(jsonify(response=get_post_dict(requested_post)), 200)
+        return make_response(jsonify(response="Could not find a post with the specified ID."), 404)
+
+    @api_validation_factory()
+    @token_required
+    def put(self, requesting_user):
+        if requesting_user.admin or requesting_user.author:
+            new_post_json = request.get_json()
+            return validate_post_addition(post_json=new_post_json, requesting_user=requesting_user)
+        else:
+            return make_response(jsonify(response="You're unauthorized to access this route."), 403)
+
+    @api_validation_factory()
+    @token_required
+    def patch(self, post_id, requesting_user):
+        return handle_post_edition(requesting_user=requesting_user, post_id=post_id,
+                                   changes_json=request.get_json())
+
+    @api_validation_factory()
+    @token_required
+    def delete(self, post_id, requesting_user):
+        return handle_post_deletion(requesting_user=requesting_user, post_id=post_id)
 
 
-@api.route('/edit-post/<int:post_id>')
-@validate_api_route
-@token_required
-def edit_post(requesting_user, post_id):
-    return handle_post_edition(requesting_user=requesting_user, post_id=post_id, changes_json=request.get_json())
+class Newsletter(Resource):
+
+    @api_validation_factory(newsletter=True)
+    @token_required
+    def post(self, requesting_user):
+        return handle_newsletter_sendout(requesting_user=requesting_user, newsletter_json=request.get_json())
 
 
-@api.route('/delete-post/<int:post_id>')
-@validate_api_route
-@token_required
-def delete_post(requesting_user, post_id):
-    return handle_post_deletion(requesting_user=requesting_user, post_id=post_id)
+flask_api.add_resource(Post, '/api/post', '/api/post/<int:post_id>')
+flask_api.add_resource(Newsletter, '/api/newsletter')

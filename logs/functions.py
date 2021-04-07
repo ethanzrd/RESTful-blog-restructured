@@ -84,3 +84,23 @@ def log_api_post_deletion(requested_post, requesting_user):
                   date=generate_date())
     db.session.add(new_log)
     db.session.commit()
+
+
+def log_newsletter_sendout(title, contents):
+    new_log = Log(user=current_user,
+                  description=f"{current_user.name} sent out a newsletter.<br><br>"
+                              f"Title: {title}<br><br>Contents: {contents}",
+                  user_name=current_user.name, date=generate_date(), category='newsletter',
+                  user_email=current_user.email)
+    db.session.add(new_log)
+    db.session.commit()
+
+
+def log_api_newsletter_sendout(requesting_user, title, contents):
+    new_log = Log(user=requesting_user,
+                  description=f"{requesting_user.name} sent out a newsletter via an API request.<br><br>"
+                              f"Title: {title}<br><br>Contents: {contents}",
+                  user_name=requesting_user.name, date=generate_date(), category='api_request',
+                  user_email=requesting_user.email)
+    db.session.add(new_log)
+    db.session.commit()

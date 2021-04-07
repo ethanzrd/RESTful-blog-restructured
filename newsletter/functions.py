@@ -3,8 +3,9 @@ from html2text import html2text
 from werkzeug.utils import redirect
 
 from data_manager import get_data
+from logs.functions import log_newsletter_sendout, log_api_newsletter_sendout
 from models import NewsletterSubscription, Log, User
-from flask import abort, flash, url_for
+from flask import abort, flash, url_for, jsonify, make_response
 from extensions import db
 from notification_system.email_notifications.notifications import newsletter_notification
 from utils import generate_date
@@ -87,6 +88,24 @@ def remove_subscriber(email, reason, explanation):
         return abort(400)
 
 
+def validate_newsletter_distribution(requesting_user, newsletter_json):
+    required = ['title', 'contents']
+    try:
+        missing = [key for key in required if key not in list(newsletter_json.keys())]
+    except (AttributeError, TypeError):
+        return make_response(jsonify(response=f"You are missing the following keys: {', '.join(required)}"), 400)
+    if not missing:
+        title, contents = newsletter_json['title'], newsletter_json['contents']
+        distribution = newsletter_distribution(title, contents, api_call=True)
+        if distribution:
+            log_api_newsletter_sendout(requesting_user, title, contents)
+            return make_response(jsonify(response="Newsletter sent."), 200)
+        else:
+            return make_response(jsonify(response="Cannot send newsletter, newsletter has no subscribers."), 409)
+    else:
+        return make_response(jsonify(response=f"You are missing the following keys: {', '.join(missing)}"), 400)
+
+
 def get_subscription_page_elements():
     try:
         subscription_page = get_data()['newsletter_configuration']
@@ -113,20 +132,22 @@ def get_unsubscription_page_elements():
     return heading, subheading
 
 
-def newsletter_distribution(title, contents):
+def newsletter_distribution(title, contents, api_call=False):
     subscribers = get_subscribers_emails()
     contents = html2text(contents)
-    if any(subscribers):
+    if subscribers:
         status = newsletter_notification(title=title, contents=html2text(contents), newsletter_recipients=subscribers)
-        flash("Newsletter sent successfully." if status else "Sender is not specified, newsletter was not sent.")
         if status:
-            new_log = Log(user=current_user, description=f"{current_user.name} sent out a newsletter.<br><br>"
-                                                         f"Title: {title}<br><br>Contents: {contents}",
-                          user_name=current_user.name, date=generate_date(), category='newsletter',
-                          user_email=current_user.email)
-            db.session.add(new_log)
-            db.session.commit()
-        return redirect(url_for('home.home_page', category="success" if status else "danger"))
+            if not api_call:
+                flash(
+                    "Newsletter sent successfully." if status else "Sender is not specified, newsletter was not sent.")
+                log_newsletter_sendout(title, contents)
+                return redirect(url_for('home.home_page', category="success" if status else "danger"))
+            else:
+                return True
     else:
-        flash("The newsletter has no subscribers, newsletter was not sent.")
-        return redirect(url_for('home.home_page', category='danger'))
+        if not api_call:
+            flash("The newsletter has no subscribers, newsletter was not sent.")
+            return redirect(url_for('home.home_page', category='danger'))
+        else:
+            return False
