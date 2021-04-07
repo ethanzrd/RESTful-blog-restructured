@@ -1,7 +1,6 @@
 import os
-from uuid import uuid4
 
-SECRET_KEY = os.environ.get('SECRET_KEY', uuid4().hex)
+SECRET_KEY = os.environ.get('SECRET_KEY', 'string')
 SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///blog.db")
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 MAIL_SERVER = 'smtp.gmail.com'

@@ -1,5 +1,5 @@
 from flask import Flask
-from extensions import ckeditor, bootstrap, mail, db, login_manager, search, gravatar, csrf_protection
+from extensions import ckeditor, bootstrap, mail, db, login_manager, search, gravatar, csrf_protection, flask_api
 from context_manager import get_name, get_date, get_background, get_social, newsletter_functionality
 from error_manager import unauthorized, forbidden, not_found, internal_error, bad_request
 from post_system.post.routes import post
@@ -31,6 +31,7 @@ def create_app(config_file='app_config.py'):
     search.init_app(app)
     gravatar.init_app(app)
     csrf_protection.init_app(app)
+    flask_api.init_app(app)
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -67,6 +68,7 @@ def create_app(config_file='app_config.py'):
 app = create_app()
 app.app_context().push()
 from models import BlogPost, ApiKey, DeletionReport, Comment, DeletedPost, User, Reply, Notification, Data
+
 db.create_all()
 
 app.context_processor(get_name)
@@ -74,7 +76,6 @@ app.context_processor(get_date)
 app.context_processor(get_background)
 app.context_processor(get_social)
 app.context_processor(newsletter_functionality)
-
 
 if __name__ == '__main__':
     app.run(debug=True)

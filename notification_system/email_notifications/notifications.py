@@ -124,7 +124,7 @@ def verify_subscription_notification(email, link):
                f" To confirm and subscribe to our newsletter, please go to the link below.\n\n" \
                f'{link}.\n\n' \
                f"Note: If you are unfamiliar with the source of this email, simply ignore it."
-    return send_mail(msg)
+    return send_mail(msg, allow_redirects=False)
 
 
 def verify_unsubscription_notification(email, name, link):
