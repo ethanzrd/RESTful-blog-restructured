@@ -3,7 +3,8 @@ from flask_login import login_required, current_user
 from werkzeug.utils import redirect
 from forms import ApiGenerate
 from post_system.post.api_validations import validate_post_addition
-from validation_manager.wrappers import api_validation_factory, admin_only, validate_api_key, token_required
+from validation_manager.wrappers import api_validation_factory, admin_only, validate_api_key, token_required, \
+    post_id_required
 from models import ApiKey, User, BlogPost
 from extensions import db
 from post_system.post.functions import get_posts, get_post_dict
@@ -132,7 +133,8 @@ def generate_token():
 class Post(Resource):
 
     @api_validation_factory()
-    def get(self, post_id):
+    @post_id_required
+    def get(self, post_id=0):
         requested_post = BlogPost.query.get(post_id)
         if requested_post:
             return make_response(jsonify(response=get_post_dict(requested_post)), 200)
@@ -149,13 +151,14 @@ class Post(Resource):
 
     @api_validation_factory()
     @token_required
-    def patch(self, post_id, requesting_user):
+    @post_id_required
+    def patch(self, requesting_user, post_id):
         return handle_post_edition(requesting_user=requesting_user, post_id=post_id,
                                    changes_json=request.get_json())
 
     @api_validation_factory()
-    @token_required
-    def delete(self, post_id, requesting_user):
+    @post_id_required
+    def delete(self, requesting_user, post_id):
         return handle_post_deletion(requesting_user=requesting_user, post_id=post_id)
 
 
@@ -167,5 +170,5 @@ class Newsletter(Resource):
         return handle_newsletter_sendout(requesting_user=requesting_user, newsletter_json=request.get_json())
 
 
-flask_api.add_resource(Post, '/api/post', '/api/post/<int:post_id>')
+flask_api.add_resource(Post, '/api/post', '/api/post')
 flask_api.add_resource(Newsletter, '/api/newsletter')

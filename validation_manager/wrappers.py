@@ -143,3 +143,16 @@ def token_required(func):
 
     wrapper.__name__ = func.__name__
     return wrapper
+
+
+def post_id_required(func):
+    """Checks whether a post id was provided when making a request to a route, or raises 400."""
+
+    def wrapper(*args, **kwargs):
+        post_id = request.args.get('post_id')
+        if post_id:
+            return func(*args, **kwargs, post_id=post_id)
+        else:
+            return make_response(jsonify(response="No Post ID specified."))
+
+    return wrapper
