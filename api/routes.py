@@ -157,6 +157,7 @@ class Post(Resource):
                                    changes_json=request.get_json())
 
     @api_validation_factory()
+    @token_required
     @post_id_required
     def delete(self, requesting_user, post_id):
         return handle_post_deletion(requesting_user=requesting_user, post_id=post_id)
