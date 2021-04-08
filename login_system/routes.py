@@ -19,7 +19,7 @@ def login():
     user_name = None
     email = None
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter_by(email=form.email.data.lower()).first()
         if user:
             if user.confirmed_email:
                 if check_password_hash(user.password, form.password.data):
@@ -42,7 +42,7 @@ def login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        return register_user(name=form.name.data, email=form.email.data, password=form.password.data)
+        return register_user(name=form.name.data, email=form.email.data.lower(), password=form.password.data)
     return render_template('register.html', form=form)
 
 
