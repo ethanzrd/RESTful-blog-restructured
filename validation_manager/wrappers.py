@@ -55,7 +55,6 @@ def api_validation_factory(newsletter=False, *args, **kwargs):
     def validate_api_route(func):
         """Checks whether a route is available or raises the appropriate error."""
 
-        @wraps(func)
         def wrapper(*args, **kwargs):
             func_name = func.__name__
             if func_name in API_METHODS.keys() and not newsletter:
@@ -71,7 +70,7 @@ def api_validation_factory(newsletter=False, *args, **kwargs):
                                                                          " is unavailable."}), 503)
             else:
                 return func(*args, **kwargs)
-
+        wrapper.__name__ = func.__name__
         return wrapper
 
     return validate_api_route
@@ -154,5 +153,5 @@ def post_id_required(func):
             return func(*args, **kwargs, post_id=post_id)
         else:
             return make_response(jsonify(response="No Post ID specified."))
-
+    wrapper.__name__ = func.__name__
     return wrapper
