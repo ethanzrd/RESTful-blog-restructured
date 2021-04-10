@@ -1,4 +1,4 @@
-from models import User, ApiKey, DeletionReport
+from models import User, ApiKey, DeletionReport, Log
 
 
 def get_user_posts(user_id):
@@ -68,19 +68,28 @@ def get_user_api(user_id):
     if requested_api is not None:
         api_dict = {1: {"key_id": requested_api.id,
                         "name": "API Key Status",
-                        "description": "Online" if requested_api.blocked is False else "Blocked",
+                        "description": "API Key Status | " + "Online" if requested_api.blocked is False else "Blocked",
                         "Developer's Occupation": requested_api.occupation,
                         "Application": requested_api.application,
                         "API Usage": requested_api.usage,
                         "API Key": requested_api.api_key},
                     2: {"name": "API Requests",
-                        "description": "Request Statistics",
+                        "description": "API Request Statistics",
                         "Total Requests": sum([requested_api.all_posts, requested_api.random_post,
                                                requested_api.all_users, requested_api.random_user]),
                         "All Posts Requests": requested_api.all_posts,
                         "Random Post Requests": requested_api.random_post,
                         "All Users Requests": requested_api.all_users,
                         "Random User Requests": requested_api.random_user}}
+        website_operation_requests = Log.query.filter_by(user=requested_api.developer, category='api_request').all()
+        if website_operation_requests:
+            api_dict[3] = {"name": "Website Operations Requests",
+                           "description": "Website Operations Request Statistics",
+                           "Total Requests": len(website_operation_requests),
+                           "Get Post Requests": requested_api.get_post,
+                           "Add Post Requests": requested_api.add_post,
+                           "Edit Post Requests": requested_api.edit_post,
+                           "Newsletter Sendout Requests": requested_api.newsletter_sendout}
         return api_dict
     return
 

@@ -129,7 +129,7 @@
                 <a href="#">
                     {% if post == "name" %}
                     <h2 class="post-title">
-                        {{all_posts[post]}} - {{all_posts["description"]}}</h2><br><h3><a href="https://documenter.getpostman.com/view/14849205/Tz5wUtjq">Documentation</a></h3>
+                        {{all_posts["description"]}}</h2><br><h3><a href="https://documenter.getpostman.com/view/14849205/Tz5wUtjq">Documentation</a></h3>
                     {% endif %}
                     {% if post != 'name' and post != 'description' and post != 'key_id' %}
                     <h2 class="post-title">
@@ -206,7 +206,7 @@
                                         style="text-decoration: none;">{{ notification['user_name'] }}</a>{% else %}{{ notification['user_name'] }} (Deleted User) {% endif %} | {{ notification["date"] }} {% if category != 'new' and category != 'removal' %}| <a style="text-decoration: none;" href="{% if category == 'comment' %}{{ url_for('comment.show_comment', comment_id=notification['parent_comment'].id) }}{% elif category == 'reply' %}{{ url_for('comment.show_comment', comment_id=notification['parent_reply'].parent_comment.id) }}{% elif category == 'block' or category == 'unblock' %}{{ url_for('user_operations.user_page', user_id=current_user.id, current_mode='api') }}{% endif %}">View {% if category == 'comment' %}Comment{% elif category == 'reply' %}Comment{% elif category == 'block' or category == 'unblock' %}API Key Information{% endif %}</a>{% endif %}</span>
                         <span style="margin-left: 20px;"><br><br>{{ notification["body"] }}<br><br></span>
                     </div>
-                    <hr style="margin: 5px 0 0 0;">
+                    <hr style="margin: 5px 0 10px 0;">
                 </li>
             </ul>
             {% endfor %}
@@ -298,14 +298,14 @@
                         </li>
                         {% endif %}
                     </ul>
+                    {% endif %}
                     {% if valid %}
-                    {% if posts_count >= 3 or current_mode == 'api' and current_id == 1 and posts_count > 0 and
-                    current_mode != 'delete-report' %}
+                    {% if posts_count >= 3 and current_mode != 'api' or current_mode == 'api' and current_id == 1 and posts_count > 0 and
+                    current_mode != 'delete-report' or posts_count >= 3 and current_mode == 'api' and current_id < 3 and api_operations and posts_count > 0 and current_mode != 'delete_report' %}
                     <a class="btn btn-primary float-right"
                        href="{{ url_for('user_operations.user_page', page_id=current_id + 1, current_mode=current_mode, user_id=user.id) }}">NEXT
                         PAGE
                         &rarr;</a>
-                    {% endif %}
                     {% endif %}
                     {% endif %}
                     {% if current_id > 1 %}

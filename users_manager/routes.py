@@ -1,6 +1,9 @@
 from flask import Blueprint, flash, render_template, url_for, request, abort
 from flask_login import login_required, current_user
 from werkzeug.utils import redirect
+from functools import partial
+
+from context_manager import user_has_api_operations
 from forms import MakeUserForm, DeleteForm, DeletionRequest
 from models import User
 from validation_manager.wrappers import admin_only

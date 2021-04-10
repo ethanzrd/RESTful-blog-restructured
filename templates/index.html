@@ -469,6 +469,12 @@
                                                     <h4>View Configuration Logs Only</h4></a>
                                             </li>
                                             {% endif %}
+                                            {% if current_view != 'api_request' %}
+                                            <li>
+                                                <a href="{{ url_for('website_settings.logs', view_filter='api_request') }}">
+                                                    <h4>View API Request Operations Logs Only</h4></a>
+                                            </li>
+                                            {% endif %}
                                             {% endif %}
                                             {% if newsletter_table == 'True' %}
                                             {% if current_view != 'inactive' %}
@@ -601,11 +607,14 @@
                                     </div>
                                 </div>
                             </div>
+                            {% if settings == "True" and mode != 'admin' %}
+                            {% set hr_valid = False %}
+                            {% endif %}
+                            {% if hr_valid and current_id != 1 or settings == "True" and current_id == 1 %}
+                            <hr>
+                            {% endif %}
                         </div>
-                        {% if settings == "True" and mode != 'admin' %}
-                        {% set hr_valid = False %}
-                        {% endif %}
-                        {% if hr_valid %}
+                        {% if hr_valid and current_id == 1 and settings != "True" %}
                         <hr>
                         {% endif %}
                     </div>

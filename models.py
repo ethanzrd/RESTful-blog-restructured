@@ -75,6 +75,11 @@ class ApiKey(db.Model):
     random_post = db.Column(db.Integer, default=0)
     all_users = db.Column(db.Integer, default=0)
     random_user = db.Column(db.Integer, default=0)
+    get_post = db.Column(db.Integer, default=0)
+    add_post = db.Column(db.Integer, default=0)
+    edit_post = db.Column(db.Integer, default=0)
+    delete_post = db.Column(db.Integer, default=0)
+    newsletter_sendout = db.Column(db.Integer, default=0)
 
     __mapper_args__ = {
         "order_by": id.desc()

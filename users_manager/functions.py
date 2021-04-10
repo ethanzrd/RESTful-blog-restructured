@@ -2,6 +2,7 @@ from flask import flash, url_for, abort
 from flask_login import current_user, logout_user, login_required
 from werkzeug.utils import redirect
 
+from context_manager import user_has_api_operations
 from users_manager.current_user_manager.functions import user_has_api_key, user_has_deletion_request, get_user_api, \
     get_user_deletion_report
 from extensions import db
@@ -158,7 +159,7 @@ def handle_user_api(user, page_id=1, **kwargs):
             return handle_page(endpoint='user.html', items_lst=requested_api, items_arg='all_posts', page_id=page_id,
                                pre_defined=True, report_exists=user_has_deletion_request(user.id), current_mode='api',
                                title=f"{user.name}'s Profile", subtitle=f"{user.name}'s API Key", user=user,
-                               admin_count=get_admin_count())
+                               admin_count=get_admin_count(), api_operations=user_has_api_operations(user))
         else:
             return abort(404)
 

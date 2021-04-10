@@ -19,8 +19,8 @@ def generate_email_verification(email, name):
     link = url_for('verification.verify_email', token=token, email=email, _external=True)
     status = verify_email(email=email, name=name, link=link)
     category = "success" if status else "danger"
-    flash("A confirmation email has been sent to you.") if status else \
-        flash("No sender specified, please contact the website staff.")
+    flash("A confirmation email has been sent to you." if status else \
+              "No sender specified, please contact the website staff.")
     return redirect(url_for('home.home_page', category=category))
 
 

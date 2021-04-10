@@ -70,6 +70,7 @@ def api_validation_factory(newsletter=False, *args, **kwargs):
                                                                          " is unavailable."}), 503)
             else:
                 return func(*args, **kwargs)
+
         wrapper.__name__ = func.__name__
         return wrapper
 
@@ -136,7 +137,12 @@ def token_required(func):
         requesting_user = User.query.get(data['user']['user_id'])
 
         if requesting_user:
-            return func(*args, **kwargs, requesting_user=requesting_user)
+            requested_key = ApiKey.query.filter_by(developer=requesting_user).first()
+            if requested_key:
+                return func(*args, **kwargs, requesting_user=requesting_user)
+            else:
+                return make_response(
+                    jsonify(response="Your account must be set as a developer account to make API requests."), 403)
         else:
             return make_response(jsonify(response="Could not find the requested user."), 404)
 
@@ -152,6 +158,7 @@ def post_id_required(func):
         if post_id:
             return func(*args, **kwargs, post_id=post_id)
         else:
-            return make_response(jsonify(response="No Post ID specified."))
+            return make_response(jsonify(response="No Post ID specified."), 400)
+
     wrapper.__name__ = func.__name__
     return wrapper

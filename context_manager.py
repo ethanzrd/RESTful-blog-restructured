@@ -1,6 +1,8 @@
 from data_manager import get_data
 import datetime as dt
 
+from models import Log
+
 
 def get_name(configuration=None):
     data = get_data()
@@ -73,3 +75,8 @@ def newsletter_functionality(configuration=None):
         except KeyError:
             enabled = False
     return dict(newsletter_enabled=enabled) if not configuration else enabled
+
+
+def user_has_api_operations(requested_user):
+    requested_user_logs = any(Log.query.filter_by(user=requested_user, category='api_request').all())
+    return requested_user_logs

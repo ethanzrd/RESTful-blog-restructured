@@ -17,4 +17,4 @@ CONFIG_KEYS = {'about_configuration': ['page_heading', 'page_subheading', 'page_
                'newsletter_configuration': ['subscription_title', 'subscription_subtitle',
                                             'unsubscription_title', 'unsubscription_subtitle',
                                             'authors_allowed', 'enabled']}
-API_METHODS = {'get': 'get_post', 'put': 'add_post', 'patch': 'edit_post', 'delete': 'delete_post'}
+API_METHODS = {'get': 'get_post', 'post': 'add_post', 'put': 'edit_post', 'delete': 'delete_post'}

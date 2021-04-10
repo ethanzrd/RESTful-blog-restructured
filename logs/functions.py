@@ -1,5 +1,7 @@
 from flask import jsonify
 from flask_login import current_user
+
+from validation_manager.functions import load_api_key
 from models import Log
 from extensions import db
 from data_manager import get_data
@@ -11,6 +13,8 @@ def get_logs_by_filter(category=None):
         return Log.query.filter_by(category='newsletter').all()
     elif category == 'configuration':
         return Log.query.filter_by(category='configuration').all()
+    elif category == 'api_request':
+        return Log.query.filter_by(category='api_request').all()
     else:
         return Log.query.all()
 
@@ -47,6 +51,8 @@ def log_changes(configuration, new_configuration, keys_lst, values_lst):
 
 
 def log_api_post_addition(post, requesting_user):
+    requested_key = load_api_key(requesting_user)
+    requested_key.add_post += 1
     new_log = Log(user=requesting_user, user_name=requesting_user.name, category='api_request',
                   description=f"{requesting_user.name} published a post via an API request.<br><br>"
                               f'Post ID: {post.id}',
@@ -56,6 +62,8 @@ def log_api_post_addition(post, requesting_user):
 
 
 def log_api_post_edition(requested_post, changes_json, requesting_user):
+    requested_key = load_api_key(requesting_user)
+    requested_key.edit_post += 1
     changes = []
     for key in changes_json:
         if getattr(requested_post, key) != changes_json[key] and any(str(changes_json[key]).strip()):
@@ -74,6 +82,8 @@ def log_api_post_edition(requested_post, changes_json, requesting_user):
 
 
 def log_api_post_deletion(requested_post, requesting_user):
+    requested_key = load_api_key(requesting_user)
+    requested_key.delete_post += 1
     post_information = [f"Author - {requested_post.author.name}",
                         f"Title - {requested_post.title}",
                         f"Subtitle - {requested_post.subtitle}"]
@@ -97,6 +107,8 @@ def log_newsletter_sendout(title, contents):
 
 
 def log_api_newsletter_sendout(requesting_user, title, contents):
+    requested_key = load_api_key(requesting_user)
+    requested_key.newsletter_sendout += 1
     new_log = Log(user=requesting_user,
                   description=f"{requesting_user.name} sent out a newsletter via an API request.<br><br>"
                               f"Title: {title}<br><br>Contents: {contents}",

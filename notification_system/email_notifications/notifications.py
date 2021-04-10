@@ -104,7 +104,7 @@ def verify_email(name, email, link):
     msg = Message('Confirmation Email', sender=EMAIL, recipients=[email])
     msg.body = f"Hello {name}, please go to this link to finalize your registration.\n\n" \
                f"{link}\n\nNote: If you're unfamiliar with the source of this email, simply ignore it."
-    return send_mail(msg)
+    return send_mail(msg, allow_redirects=False)
 
 
 def email_set_as_support_notification(email, link):

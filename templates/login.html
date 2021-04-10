@@ -29,7 +29,8 @@
                 <center>
                     {% if message != 'unconfirmed' %}
                     {% if message == 'Incorrect password, please try again.' %}
-                    <strong>{{message}} <a href="{{ url_for('verification.generate_forget') }}">Forgot your password?</a></strong>
+                    <strong>{{message}} <a href="{{ url_for('verification.generate_forget') }}">Forgot your
+                        password?</a></strong>
                     {% else %}
                     <strong>{{ message }}</strong>
                     {% endif %}
@@ -43,22 +44,24 @@
             {% endfor %}
             {% endwith %}
             {% if forget != True and handling != True %}
-            <p style="color: black;">New to the website? <a href="{{ url_for('login_system.register') }}">Click here</a> to register!
+            <p style="color: black;">New to the website? <a href="{{ url_for('login_system.register') }}">Click here</a>
+                to register!
             </p>
             {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
             {% else %}
             {% if handling != True %}
-            <form action="{{ url_for('verification.forget_password', token=token, email=email) }}" method="post" novalidate>
+            <form action="{{ url_for('verification.forget_password', token=token, email=email) }}" method="post"
+                  novalidate>
                 {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
                 {% else %}
                 <form action="{{ url_for('verification.generate_forget') }}" method="post" novalidate>
                     {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
                     {% endif %}
                     {% endif %}
+                </form>
         </div>
     </div>
+    <hr style="margin: 35px 0 20px 0;">
 </div>
-
-<hr style="margin: 35px 0 20px 0;">
 {% include "footer.html" %}
 {% endblock %}

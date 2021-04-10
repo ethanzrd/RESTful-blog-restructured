@@ -142,7 +142,7 @@ class Post(Resource):
 
     @api_validation_factory()
     @token_required
-    def put(self, requesting_user):
+    def post(self, requesting_user):
         if requesting_user.admin or requesting_user.author:
             new_post_json = request.get_json()
             return validate_post_addition(post_json=new_post_json, requesting_user=requesting_user)
@@ -152,7 +152,7 @@ class Post(Resource):
     @api_validation_factory()
     @token_required
     @post_id_required
-    def patch(self, requesting_user, post_id):
+    def put(self, requesting_user, post_id):
         return handle_post_edition(requesting_user=requesting_user, post_id=post_id,
                                    changes_json=request.get_json())
 
