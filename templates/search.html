@@ -13,7 +13,7 @@
             <div class="col-lg-8 col-md-10 mx-auto">
                 <div class="page-heading">
                     <h1 style="color: {{navbar}}">Search</h1>
-                    <span style="color: {{navbar}}" class="subheading">Perform a website-wide search.</span>
+                    <span class="subheading" style="color: {{navbar}}">Perform a website-wide search.</span>
                 </div>
             </div>
         </div>
@@ -35,8 +35,8 @@
             {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
         </div>
     </div>
+    <hr style="margin: 35px 0 20px 0;">
 </div>
 
-<hr style="margin: 35px 0 20px 0;">
 {% include "footer.html" %}
 {% endblock %}
