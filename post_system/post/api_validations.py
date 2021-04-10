@@ -48,6 +48,6 @@ def validate_post_deletion(requested_post, requesting_user):
         db.session.delete(requested_post)
         db.session.commit()
         log_api_post_deletion(requested_post=requested_post, requesting_user=requesting_user)
-        return make_response(jsonify(message="Post deleted successfully."), 200)
+        return make_response(jsonify(response="Post deleted successfully."), 200)
     else:
         return make_response(jsonify(response="Malformed request."), 400)

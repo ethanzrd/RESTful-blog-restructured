@@ -130,11 +130,11 @@ def handle_post_deletion(requesting_user, post_id):
             if requested_post.author == requesting_user or requesting_user.admin:
                 return validate_post_deletion(requested_post=requested_post, requesting_user=requesting_user)
             else:
-                return make_response(jsonify("You're unauthorized to delete this post."), 403)
+                return make_response(jsonify(response="You're unauthorized to delete this post."), 403)
         else:
-            return make_response(jsonify(message="Could not find a post with the specified ID."), 404)
+            return make_response(jsonify(response="Could not find a post with the specified ID."), 404)
     else:
-        return make_response(jsonify("You're unauthorized to access this route."), 403)
+        return make_response(jsonify(response="You're unauthorized to access this route."), 403)
 
 
 def handle_newsletter_sendout(requesting_user, newsletter_json):
