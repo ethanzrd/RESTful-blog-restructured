@@ -89,6 +89,7 @@ def get_user_api(user_id):
                            "Get Post Requests": requested_api.get_post,
                            "Add Post Requests": requested_api.add_post,
                            "Edit Post Requests": requested_api.edit_post,
+                           "Delete Post Requests": requested_api.delete_post,
                            "Newsletter Sendout Requests": requested_api.newsletter_sendout}
         return api_dict
     return
