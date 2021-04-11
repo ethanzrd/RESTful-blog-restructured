@@ -134,7 +134,7 @@ class Post(Resource):
 
     @api_validation_factory()
     @post_id_required
-    def get(self, post_id=0):
+    def get(self, post_id):
         requested_post = BlogPost.query.get(post_id)
         if requested_post:
             return make_response(jsonify(response=get_post_dict(requested_post)), 200)
