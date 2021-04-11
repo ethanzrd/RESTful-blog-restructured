@@ -37,8 +37,7 @@ def create_app(config_file='app_config.py'):
     def load_user(user_id):
         try:
             requested_user = User.query.get(user_id)
-            if requested_user.confirmed_email:
-                return requested_user
+            return requested_user
         except AttributeError:
             pass
 
