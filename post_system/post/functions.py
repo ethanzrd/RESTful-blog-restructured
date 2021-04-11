@@ -24,7 +24,8 @@ def get_posts():
 
 
 def get_post_dict(post):
-    post_dict = {"author": post.author.name,
+    post_dict = {"post_id": post.id,
+                 "author": post.author.name,
                  "title": post.title,
                  "subtitle": post.subtitle,
                  "published_on": post.date,

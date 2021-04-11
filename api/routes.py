@@ -58,7 +58,7 @@ def unblock_key(key_id):
 @validate_api_key
 @api_validation_factory()
 def all_posts():
-    api_key = request.args.get('api_key')
+    api_key = request.headers.get('api_key')
     try:
         requesting_user = ApiKey.query.filter_by(api_key=api_key).first()
         requesting_user.all_posts += 1
@@ -74,7 +74,7 @@ def all_posts():
 @validate_api_key
 @api_validation_factory()
 def random_post():
-    api_key = request.args.get('api_key')
+    api_key = request.headers.get('api_key')
     try:
         requesting_user = ApiKey.query.filter_by(api_key=api_key).first()
         requesting_user.random_post += 1
@@ -94,7 +94,7 @@ def random_post():
 @validate_api_key
 @api_validation_factory()
 def all_users():
-    api_key = request.args.get('api_key')
+    api_key = request.headers.get('api_key')
     try:
         requesting_user = ApiKey.query.filter_by(api_key=api_key).first()
         requesting_user.all_users += 1
@@ -109,7 +109,7 @@ def all_users():
 @validate_api_key
 @api_validation_factory()
 def random_user():
-    api_key = request.args.get('api_key')
+    api_key = request.headers.get('api_key')
     try:
         requesting_user = ApiKey.query.filter_by(api_key=api_key).first()
         requesting_user.random_user += 1

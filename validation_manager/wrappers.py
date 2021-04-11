@@ -82,7 +82,7 @@ def validate_api_key(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        api_key = request.args.get('api_key')
+        api_key = request.headers.get('api_key')
         requested_key = ApiKey.query.filter_by(api_key=api_key).first()
         if requested_key:
             if is_key_blocked(api_key):
