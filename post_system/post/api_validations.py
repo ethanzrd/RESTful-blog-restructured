@@ -3,6 +3,7 @@ from flask import jsonify, abort, make_response
 from extensions import db
 from logs.functions import log_api_post_edition, log_api_post_addition, log_api_post_deletion
 from models import BlogPost
+from post_system.post.functions import store_deleted_post
 from utils import generate_date
 
 
@@ -45,8 +46,7 @@ def validate_post_edition(requested_post, changes_json, requesting_user):
 
 def validate_post_deletion(requested_post, requesting_user):
     if requested_post:
-        db.session.delete(requested_post)
-        db.session.commit()
+        store_deleted_post(requested_post)
         log_api_post_deletion(requested_post=requested_post, requesting_user=requesting_user)
         return make_response(jsonify(response="Post deleted successfully."), 200)
     else:

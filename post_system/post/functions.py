@@ -3,7 +3,7 @@ from werkzeug.utils import redirect
 
 from models import BlogPost, DeletedPost, Comment, Reply, User
 from html2text import html2text
-from flask import abort, url_for, render_template
+from flask import abort, url_for, render_template, make_response, jsonify
 from utils import generate_date
 from flask_login import current_user
 from extensions import db
@@ -104,25 +104,33 @@ def post_deletion(requested_post):
     if current_user.is_authenticated and current_user.author is True and \
             requested_post.author.email == current_user.email \
             or current_user.is_authenticated and current_user.admin is True:
-        try:
-            post_comments = requested_post.comments
-        except AttributeError:
-            return abort(404)
-        new_post = get_full_post_dict(requested_post)
-        new_deleted = DeletedPost(json_column=new_post)
-        db.session.add(new_deleted)
-        [db.session.delete(comment) for comment in post_comments]
-        for reply_item in Reply.query.all():
-            try:
-                reply = reply_item.parent_comment.post_id
-            except (AttributeError, TypeError):
-                db.session.delete(reply_item)
-        db.session.delete(requested_post)
-        [clean_notifications(current_category) for current_category in ['comment', 'reply']]
-        db.session.commit()
+        store_deleted_post(requested_post)
         return redirect(url_for('home.home_page'))
     else:
         return abort(403)
+
+
+def store_deleted_post(requested_post, allow_redirects=True):
+    try:
+        post_comments = requested_post.comments
+    except AttributeError:
+        if allow_redirects:
+            return abort(404)
+        else:
+            return make_response(
+                jsonify(response="An error occurred the handling of your request, the post could not be found."))
+    new_post = get_full_post_dict(requested_post)
+    new_deleted = DeletedPost(json_column=new_post)
+    db.session.add(new_deleted)
+    [db.session.delete(comment) for comment in post_comments]
+    for reply_item in Reply.query.all():
+        try:
+            reply = reply_item.parent_comment.post_id
+        except (AttributeError, TypeError):
+            db.session.delete(reply_item)
+    db.session.delete(requested_post)
+    [clean_notifications(current_category) for current_category in ['comment', 'reply']]
+    db.session.commit()
 
 
 def post_recovery(database_entry, requested_post):
