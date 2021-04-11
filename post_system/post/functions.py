@@ -1,6 +1,7 @@
 from sqlalchemy.orm.exc import UnmappedInstanceError
 from werkzeug.utils import redirect
 
+from logs.functions import log_permanent_deletion, log_deletion
 from models import BlogPost, DeletedPost, Comment, Reply, User
 from html2text import html2text
 from flask import abort, url_for, render_template, make_response, jsonify
@@ -105,6 +106,7 @@ def post_deletion(requested_post):
     if current_user.is_authenticated and current_user.author is True and \
             requested_post.author.email == current_user.email \
             or current_user.is_authenticated and current_user.admin is True:
+        log_deletion(requested_post)
         store_deleted_post(requested_post)
         return redirect(url_for('home.home_page'))
     else:
@@ -169,6 +171,7 @@ def post_recovery(database_entry, requested_post):
 def post_permanent_deletion(database_entry):
     if current_user.is_authenticated and current_user.admin:
         try:
+            log_permanent_deletion(requested_post=database_entry)
             db.session.delete(database_entry)
         except UnmappedInstanceError:
             return abort(404)

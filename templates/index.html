@@ -475,6 +475,12 @@
                                                     <h4>View API Request Operations Logs Only</h4></a>
                                             </li>
                                             {% endif %}
+                                            {% if current_view != 'post' %}
+                                            <li>
+                                                <a href="{{ url_for('website_settings.logs', view_filter='post') }}">
+                                                    <h4>View Post Operations Logs Only</h4></a>
+                                            </li>
+                                            {% endif %}
                                             {% endif %}
                                             {% if newsletter_table == 'True' %}
                                             {% if current_view != 'inactive' %}

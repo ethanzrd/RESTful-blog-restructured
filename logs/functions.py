@@ -1,11 +1,10 @@
-from flask import jsonify
 from flask_login import current_user
-
 from validation_manager.functions import load_api_key
-from models import Log
+from models import Log, User
 from extensions import db
 from data_manager import get_data
 from utils import generate_date
+from flask import abort
 
 
 def get_logs_by_filter(category=None):
@@ -15,8 +14,30 @@ def get_logs_by_filter(category=None):
         return Log.query.filter_by(category='configuration').all()
     elif category == 'api_request':
         return Log.query.filter_by(category='api_request').all()
+    elif category == 'post':
+        return Log.query.filter_by(category='post').all()
     else:
         return Log.query.all()
+
+
+def get_post_log_information(requested_post, deleted=False):
+    try:
+        if not deleted:
+            post_author = requested_post.author.name
+            post_title = requested_post.title
+            post_subtitle = requested_post.subtitle
+        else:
+            requested_post = requested_post.json_column
+            post_author = User.query.get(requested_post['author_id']).name
+            post_title = requested_post['post_title']
+            post_subtitle = requested_post['subtitle']
+    except (KeyError, AttributeError):
+        return abort(400)
+    post_information = [f"Author - {post_author}",
+                        f"Title - {post_title}",
+                        f"Subtitle - {post_subtitle}"]
+    log_information = '<br><br>'.join(post_information)
+    return log_information
 
 
 def log_changes(configuration, new_configuration, keys_lst, values_lst):
@@ -84,10 +105,7 @@ def log_api_post_edition(requested_post, changes_json, requesting_user):
 def log_api_post_deletion(requested_post, requesting_user):
     requested_key = load_api_key(requesting_user)
     requested_key.delete_post += 1
-    post_information = [f"Author - {requested_post.author.name}",
-                        f"Title - {requested_post.title}",
-                        f"Subtitle - {requested_post.subtitle}"]
-    log_information = '<br><br>'.join(post_information)
+    log_information = get_post_log_information(requested_post)
     new_log = Log(user=requesting_user, user_name=requesting_user.name, category='api_request',
                   description=f"{requesting_user.name} deleted a post via an API request.<br><br>"
                               f"Post Details:<br><br>{log_information}", user_email=requesting_user.email,
@@ -102,6 +120,26 @@ def log_newsletter_sendout(title, contents):
                               f"Title: {title}<br><br>Contents: {contents}",
                   user_name=current_user.name, date=generate_date(), category='newsletter',
                   user_email=current_user.email)
+    db.session.add(new_log)
+    db.session.commit()
+
+
+def log_permanent_deletion(requested_post):
+    log_information = get_post_log_information(requested_post, deleted=True)
+    new_log = Log(user=current_user, user_name=current_user.name, category='post',
+                  description=f"{current_user.name} permanently deleted a post.<br><br>"
+                              f"Post Details:<br><br>{log_information}", user_email=current_user.email,
+                  date=generate_date())
+    db.session.add(new_log)
+    db.session.commit()
+
+
+def log_deletion(requested_post):
+    log_information = get_post_log_information(requested_post)
+    new_log = Log(user=current_user, user_name=current_user.name, category='post',
+                  description=f"{current_user.name} deleted a post.<br><br>"
+                              f"Post Details:<br><br>{log_information}", user_email=current_user.email,
+                  date=generate_date())
     db.session.add(new_log)
     db.session.commit()
 
