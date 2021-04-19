@@ -18,7 +18,6 @@ def register_user(name, email, password):
             db.session.delete(user)
             db.session.commit()
             add_user(name, email, password)
-            generate_email_verification(email, name)
             return redirect(url_for('home.home_page'))
 
     return redirect(url_for('home.home_page'))
