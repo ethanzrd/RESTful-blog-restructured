@@ -54,11 +54,38 @@ def get_options(website=False):
             return abort(403)
     else:
         if current_user.is_authenticated:
-            options_dict = {}
+            options_dict = {1: {"name": "Change Account Password",
+                                "desc": "Change your account password.",
+                                "func": "login_system.change_password"}}
             if not user_has_api_key(current_user.id):
                 options_dict[get_last(options_dict)] = {"name": "Generate API Key",
                                                         "desc": "Generate an API Key to use our API services.",
                                                         "func": "api.generate_key"}
+            if not current_user.twitter_name:
+                options_dict[get_last(options_dict)] = {"name": "Link Twitter Account",
+                                                        "desc": "Link your Twitter account to log in via Twitter"
+                                                                " (Less secure than other providers).",
+                                                        "func": "oauth.link_twitter"}
+            else:
+                options_dict[get_last(options_dict)] = {"name": "Unlink Twitter Account",
+                                                        "desc": "Unlink your Twitter account.",
+                                                        "func": "oauth.unlink_twitter"}
+            if not current_user.github_id:
+                options_dict[get_last(options_dict)] = {"name": "Link GitHub Account",
+                                                        "desc": "Link your GitHub account to log in via GitHub.",
+                                                        "func": "oauth.link_github"}
+            else:
+                options_dict[get_last(options_dict)] = {"name": "Unlink GitHub Account",
+                                                        "desc": "Unlink your GitHub account.",
+                                                        "func": "oauth.unlink_github"}
+            if not current_user.google_id:
+                options_dict[get_last(options_dict)] = {"name": "Link Google Account",
+                                                        "desc": "Link your Google account to log in via Google.",
+                                                        "func": "oauth.link_google"}
+            else:
+                options_dict[get_last(options_dict)] = {"name": "Unlink Google Account",
+                                                        "desc": "Unlink your Google account.",
+                                                        "func": "oauth.unlink_google"}
             if not user_has_deletion_request(current_user.id):
                 options_dict[get_last(options_dict)] = {"name": "Delete my Account",
                                                         "desc": "Request account deletion",

@@ -135,6 +135,7 @@ def request_deletion():
 
 
 @user_operations.route('/settings')
+@user_operations.route('/settings/<int:page_id>')
 @login_required
-def settings():
-    return handle_account_settings()
+def settings(page_id=1):
+    return handle_account_settings(page_id)

@@ -1,12 +1,11 @@
 from flask import Blueprint, url_for, flash, render_template, request, abort
-from flask_login import login_user, login_required, logout_user
-from werkzeug.security import check_password_hash, generate_password_hash
+from flask_login import login_user, login_required, logout_user, current_user
+from werkzeug.security import check_password_hash
 from werkzeug.utils import redirect
-
-from forms import LoginForm, RegisterForm
+from forms import LoginForm, RegisterForm, ChangePasswordForm
 from models import User
 from validation_manager.wrappers import logout_required
-from login_system.functions import register_user
+from login_system.functions import register_user, password_change
 from verification_manager.generate_verification import generate_email_verification
 
 login_system = Blueprint('login_system', __name__)
@@ -54,6 +53,18 @@ def validate():
         return abort(400)
     else:
         return generate_email_verification(email, name)
+
+
+@login_system.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if check_password_hash(current_user.password, form.old_password.data):
+            return password_change(form.new_password.data)
+        else:
+            flash("The old password does not match.")
+    return render_template('config.html', form=form, config_func='login_system.change_password')
 
 
 @login_system.route('/logout')

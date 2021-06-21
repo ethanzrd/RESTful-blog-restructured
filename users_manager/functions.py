@@ -219,10 +219,10 @@ def handle_deletion_request(reason, explanation):
         return generate_deletion()
 
 
-def handle_account_settings():
+def handle_account_settings(page_id):
     options = get_options()
     title = "Account Settings"
     subtitle = "Here you will be able to configure your account settings."
     errors = {}
     return handle_page(endpoint='index.html', settings="True", items_lst=options, errors=errors,
-                       title=title, subtitle=subtitle, page_id=1, mode='admin', items_arg='options')
+                       title=title, subtitle=subtitle, page_id=page_id, mode='user', items_arg='options')

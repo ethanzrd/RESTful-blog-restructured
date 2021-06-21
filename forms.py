@@ -181,7 +181,7 @@ class NewsletterSubscriptionForm(FlaskForm):
     submit = SubmitField("Subscribe to the newsletter", render_kw={"style": "margin-top: 20px;"})
 
 
-class   NewsletterUnsubscribeForm(FlaskForm):
+class NewsletterUnsubscribeForm(FlaskForm):
     email = StringField("Email Address", validators=[DataRequired(), Email()])
     reason = SelectField("Why are you unsubscribing from the newsletter?", choices=[('Dissatisfied', 'Dissatisfied'),
                                                                                     (
@@ -208,3 +208,9 @@ class NewsletterConfigurationForm(FlaskForm):
     authors_allowed = BooleanField('Allow authors to send out newsletters')
     enabled = BooleanField('Enable Newsletter Functionality')
     submit = SubmitField("Save Changes", render_kw={"style": "margin-top: 20px;"})
+
+
+class ChangePasswordForm(FlaskForm):
+    old_password = PasswordField("Enter your old password:", validators=[DataRequired()])
+    new_password = PasswordField("Enter your new password:", validators=[DataRequired()])
+    submit = SubmitField("Submit", render_kw={"style": "margin-top: 20px;"})

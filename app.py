@@ -16,6 +16,8 @@ from website_settings.routes import website_settings
 from login_system.routes import login_system
 from newsletter.routes import newsletter
 from general.home import home
+from login_system.oauth.blueprints import twitter_blueprint, github_blueprint, google_blueprint
+from login_system.oauth.routes import oauth_routing
 
 
 def create_app(config_file='app_config.py'):
@@ -52,6 +54,10 @@ def create_app(config_file='app_config.py'):
     app.register_blueprint(website_settings)
     app.register_blueprint(login_system)
     app.register_blueprint(newsletter)
+    app.register_blueprint(twitter_blueprint)
+    app.register_blueprint(oauth_routing)
+    app.register_blueprint(github_blueprint)
+    app.register_blueprint(google_blueprint)
 
     app.register_error_handler(400, bad_request)
     app.register_error_handler(403, forbidden)

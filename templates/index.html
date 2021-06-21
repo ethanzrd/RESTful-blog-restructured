@@ -551,7 +551,7 @@
                                         {% if settings == 'True' and current_id < 3 %}
                                         {% if mode != 'admin' %}
                                         <a class="btn btn-primary float-right"
-                                           href="{{ url_for('user_operations.user_page', page_id=current_id + 1, settings=True, mode=mode) }}">NEXT
+                                           href="{{ url_for('user_operations.settings', page_id=current_id + 1, settings=True, mode=mode) }}">NEXT
                                             PAGE
                                             &rarr;</a>
                                         {% else %}
@@ -616,7 +616,7 @@
                             {% if settings == "True" and mode != 'admin' %}
                             {% set hr_valid = False %}
                             {% endif %}
-                            {% if hr_valid and current_id != 1 or settings == "True" and current_id == 1 %}
+                            {% if hr_valid and current_id != 1 or settings == "True" %}
                             <hr>
                             {% endif %}
                         </div>

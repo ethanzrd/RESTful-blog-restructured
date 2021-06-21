@@ -1,8 +1,10 @@
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from extensions import db
 from sqlalchemy.orm import relationship
 from sqlalchemy_json import mutable_json_type
 from sqlalchemy.dialects.postgresql import JSON
+from flask_dance.consumer.storage.sqla import OAuthConsumerMixin, SQLAlchemyStorage
+from login_system.oauth.blueprints import twitter_blueprint
 
 
 class User(UserMixin, db.Model):
@@ -23,6 +25,17 @@ class User(UserMixin, db.Model):
     deletion_report = relationship('DeletionReport', back_populates='user')
     notifications = relationship("Notification", back_populates='user')
     logs = relationship("Log", back_populates='user')
+    twitter_name = db.Column(db.String, default='')
+    github_id = db.Column(db.Integer, default=None)
+    google_id = db.Column(db.String, default=None)
+
+
+class OAuth(OAuthConsumerMixin, db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    user = db.relationship(User)
+
+
+twitter_blueprint.backend = SQLAlchemyStorage(OAuth, db.session, user=current_user)
 
 
 class DeletionReport(db.Model):

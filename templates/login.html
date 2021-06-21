@@ -47,6 +47,7 @@
             <p style="color: black;">New to the website? <a href="{{ url_for('login_system.register') }}">Click here</a>
                 to register!
             </p>
+            <p style="color: black;">Login via supported providers: <a style="text-decoration: none;" href="{{ url_for('oauth.login_with_twitter') }}"><strong>Twitter</strong></a>, <a style="text-decoration: none;" href="{{ url_for('oauth.login_with_github') }}"><strong>GitHub</strong></a>, <a style="text-decoration: none;" href="{{ url_for('oauth.login_with_google') }}"><strong>Google</strong></a></p>
             {{ wtf.quick_form(form, novalidate=True, button_map={"submit": "primary"}) }}
             {% else %}
             {% if handling != True %}

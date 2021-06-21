@@ -83,13 +83,13 @@ def contact_inquiry_notification(email, name, action_reason):
     send_mail(msg)
 
 
-def password_changed_notification(email, name, date):
+def password_changed_notification(email, name, date=generate_date(), redirect=True):
     msg = Message(f'Password Changed', sender=EMAIL, recipients=[email])
     msg.body = f"Hello {name}, this is an automatic email from {get_name('m')} to notify you of recent" \
                f" events that occurred in regards to your account.\n\n" \
                f'Your account password was changed at {date}.\n\n' \
                f"If this wasn't you, contact us by replying to this email or via our website."
-    send_mail(msg)
+    return send_mail(msg, allow_redirects=redirect)
 
 
 def reset_password_notification(name, email, link):
