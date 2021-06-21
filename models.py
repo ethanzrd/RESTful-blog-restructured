@@ -25,9 +25,9 @@ class User(UserMixin, db.Model):
     deletion_report = relationship('DeletionReport', back_populates='user')
     notifications = relationship("Notification", back_populates='user')
     logs = relationship("Log", back_populates='user')
-    twitter_name = db.Column(db.String, default='')
-    github_id = db.Column(db.Integer, default=None)
-    google_id = db.Column(db.String, default=None)
+    twitter_name = db.Column(db.String, unique=True)
+    github_id = db.Column(db.Integer, unique=True)
+    google_id = db.Column(db.String, unique=True)
 
 
 class OAuth(OAuthConsumerMixin, db.Model):
