@@ -30,3 +30,4 @@ flask_restful==0.3.8
 flask_swagger==0.2.14
 uuid==1.30
 pyjwt==2.0.1
+flask_dance==5.0.0
