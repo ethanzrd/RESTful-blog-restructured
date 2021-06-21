@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy_json import mutable_json_type
 from sqlalchemy.dialects.postgresql import JSON
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin, SQLAlchemyStorage
-from login_system.oauth.blueprints import twitter_blueprint
+from login_system.oauth.blueprints import twitter_blueprint, github_blueprint, google_blueprint
 
 
 class User(UserMixin, db.Model):
@@ -36,6 +36,8 @@ class OAuth(OAuthConsumerMixin, db.Model):
 
 
 twitter_blueprint.backend = SQLAlchemyStorage(OAuth, db.session, user=current_user)
+github_blueprint.backend = SQLAlchemyStorage(OAuth, db.session, user=current_user)
+google_blueprint.backend = SQLAlchemyStorage(OAuth, db.session, user=current_user)
 
 
 class DeletionReport(db.Model):
