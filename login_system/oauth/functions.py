@@ -50,7 +50,7 @@ def link_provider(user_identifier, provider_identifier, provider):
 
 
 def unlink_provider(provider_identifier, provider):
-    setattr(current_user, provider_identifier, '')
+    setattr(current_user, provider_identifier, None)
     db.session.commit()
     flash(f"Your {provider} account has been unlinked.")
     return redirect(url_for('home.home_page', category='success'))
