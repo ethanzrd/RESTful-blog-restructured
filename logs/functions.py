@@ -88,15 +88,17 @@ def log_api_post_edition(requested_post, changes_json, requesting_user):
     changes = []
     for key in changes_json:
         if getattr(requested_post, key) != changes_json[key] and any(str(changes_json[key]).strip()):
-            new_change = f"{key.title() if key != 'img_url' else 'Image URL'}:" \
-                         f" {requested_post[key]} -> {changes_json[key]}"
+            new_change = (
+                f"{key.title() if key != 'img_url' else 'Image URL'}: "
+                f"{getattr(requested_post, key)} -> {changes_json[key]}"
+            )
             changes.append(new_change)
     changes_description = '<br><br>'.join(changes)
     if any(changes):
         new_log = Log(user=requesting_user, user_name=requesting_user.name, category='api_request',
                       description=f"{requesting_user.name} edited a post via an API request.<br>"
                                   f'Post ID: {requested_post.id}<br><br>'
-                                  f'Changes:<br><br>{changes_description}', user_email=requesting_user.emai,
+                                  f'Changes:<br><br>{changes_description}', user_email=requesting_user.email,
                       date=generate_date())
         db.session.add(new_log)
         db.session.commit()
