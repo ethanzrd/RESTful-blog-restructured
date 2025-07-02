@@ -111,7 +111,9 @@ def delete_user(user_id, token=None):
     if user:
         if user.admin:
             if token:
-                load_token(token=token, salt='remove-auth')
+                response = load_token(token=token, salt='remove-auth')
+                if response:
+                    return response
             else:
                 return redirect(url_for('verification.authorization', user_id=user_id))
         form = DeleteForm()

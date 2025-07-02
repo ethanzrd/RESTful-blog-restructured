@@ -34,7 +34,9 @@ def generate_forget():
 
 @verification.route('/handle-forget/<token>', methods=['GET', 'POST'])
 def forget_password(token):
-    load_token(token=token, salt='forget-password', redirect_to='login_system.login')
+    response = load_token(token=token, salt='forget-password', redirect_to='login_system.login')
+    if response:
+        return response
     email = request.args.get('email')
     form = ForgetPasswordForm()
     user = User.query.filter_by(email=email).first()
@@ -58,7 +60,9 @@ def handle_support_confirmation(token):
 def handle_new_admin(token):
     if get_admin_count() > 0:
         admin_redirect()
-    load_token(token, salt='make-auth')
+    response = load_token(token, salt='make-auth')
+    if response:
+        return response
     try:
         user_id = int(request.args.get('user_id'))
     except (TypeError, ValueError):
@@ -82,7 +86,9 @@ def handle_new_admin(token):
 @verification.route('/admin-remove/<token>', methods=['GET', 'POST'])
 @admin_only
 def handle_admin_removal(token):
-    load_token(token=token, salt='remove-auth')
+    response = load_token(token=token, salt='remove-auth')
+    if response:
+        return response
     try:
         user_id = int(request.args.get('user_id'))
     except (TypeError, ValueError):
