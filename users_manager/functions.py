@@ -149,8 +149,8 @@ def handle_user_posts(user, page_id=1, **kwargs):
 
 
 def handle_user_api(user, page_id=1, **kwargs):
-    if current_user.is_authenticated and current_user.email == User.query.get(user.id).email \
-            or current_user.admin is True:
+    if current_user.is_authenticated and (
+            current_user.email == User.query.get(user.id).email or current_user.admin is True):
         try:
             requested_api = get_user_api(user.id)
         except AttributeError:
@@ -162,6 +162,8 @@ def handle_user_api(user, page_id=1, **kwargs):
                                admin_count=get_admin_count(), api_operations=user_has_api_operations(user))
         else:
             return abort(404)
+    else:
+        return abort(403)
 
 
 def handle_user_comments(user, page_id=1, **kwargs):
@@ -172,8 +174,8 @@ def handle_user_comments(user, page_id=1, **kwargs):
 
 
 def handle_user_deletion_report(user, **kwargs):
-    if current_user.is_authenticated and current_user.email == User.query.get(user.id).email \
-            or current_user.admin is True:
+    if current_user.is_authenticated and (
+            current_user.email == User.query.get(user.id).email or current_user.admin is True):
         requested_report = get_user_deletion_report(user.id)
         if requested_report:
             return handle_page(endpoint='user.html', items_arg='all_posts', items_lst=requested_report, page_id=1,
@@ -182,6 +184,8 @@ def handle_user_deletion_report(user, **kwargs):
                                subtitle=f"{user.name}'s Deletion Request Report", api_exists=user_has_api_key(user.id))
         else:
             return abort(404)
+    else:
+        return abort(403)
 
 
 def handle_account_deletion(user, title, reason):
