@@ -133,7 +133,12 @@ def token_required(func):
         token = request.headers.get('x-access-token')
         if not token:
             return make_response(jsonify(response="Missing token."), 401)
-        data = jwt.decode(token, SECRET_KEY, algorithms="HS256")
+        try:
+            data = jwt.decode(token, SECRET_KEY, algorithms="HS256")
+        except jwt.ExpiredSignatureError:
+            return make_response(jsonify(response="Token expired."), 401)
+        except jwt.InvalidTokenError:
+            return make_response(jsonify(response="Invalid token."), 401)
         requesting_user = User.query.get(data['user']['user_id'])
 
         if requesting_user:
